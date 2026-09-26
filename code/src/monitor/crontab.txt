@@ -1,0 +1,18 @@
+# contentHub 运维监控 crontab(由 museum/code/src/monitor/crontab.txt 迁移并改造为 contentHub 口径)
+#
+# ★ 说明:
+#   - 本文件为 **Linux 部署样例**(crontab 格式); Windows 请改用 `code/src/tools/runOpsJobs.ps1`(计划任务);
+#   - monitor.py 已按 contentHub 口径剥离进程 kill / 网络探活, 本脚本仅用于「重启文件变化守护」;
+#   - 七项指标监控由 chmonitor/dailyCheck.py 承担, 建议一并纳入定时任务(本样例已包含)。
+#
+# M H D m d cmd
+#监控守护(每 5 分钟): 文件变化检测 + 委托 chmonitor 运行七项指标
+*/5 * * * * sh /data/contenthub/src/monitor/restore_monitor.sh > /data/contenthub/log/monitorlog 2>&1
+
+#每日巡检(每天 0:10): 七项指标汇总报告 -> code/data/monitor/
+10 0 * * * cd /data/contenthub/src && python3 chmonitor/dailyCheck.py >> /data/contenthub/log/monitorlog 2>&1
+
+#归档清理(每天 1:00): ★ 默认 dry-run; 真删需显式 --execute(主计划 8.6 红线: 误删不可逆)
+0 1 * * * cd /data/contenthub/src && python3 schedule/archive.py >> /data/contenthub/log/monitorlog 2>&1
+
+@reboot sh /data/contenthub/src/monitor/restore_monitor.sh > /data/contenthub/log/monitorlog 2>&1

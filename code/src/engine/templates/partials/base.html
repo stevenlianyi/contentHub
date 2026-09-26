@@ -1,0 +1,29 @@
+{#
+  contentHub 版式模板共用骨架(4 套版式 + 站内预览共用)。
+
+  设计约束(见 code/src/plan.md §4 渲染期约定):
+  - embedMode=True 时只输出「片段 + <style>」, 供站内预览页嵌入手机框;
+    embedMode=False 时输出完整 HTML 文档, 便于浏览器直接预览与 SP3 截图;
+  - 版式样式一律 scoped 到各自 data-layout 根节点, 不依赖 body/html 选择器(class 语义仅作 JS 钩子,
+    布局表达用内联 style 与 data-* 属性), 为 SP3 微信内联化留余地;
+  - 不引入任何平台专属域名/URL 硬编码(平台差异由上游 ch_platform/specJson 数据驱动)。
+#}
+{% if not embedMode %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ pageTitle | default('contentHub') }}</title>
+</head>
+<body style="margin:0;padding:0;background:#f5f6f8;">
+{% endif %}
+<style>
+{{ baseStyle | default('') }}
+{% block style %}{% endblock %}
+</style>
+{% block content %}{% endblock %}
+{% if not embedMode %}
+</body>
+</html>
+{% endif %}

@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>内容管理与多平台发布 · 竞品调研与开发计划</title>
+<style>
+  :root{
+    --bg:#f5f6f8; --surface:#ffffff; --surface-2:#fafbfc;
+    --text:#171a1f; --muted:#5c6672; --faint:#8b96a3;
+    --border:#e4e7eb; --border-strong:#d0d5db;
+    --brand:#1f5fd6; --brand-soft:#eaf1fd;
+    --p0:#d92d20; --p0-soft:#fef3f2;
+    --p1:#b54708; --p1-soft:#fffaeb;
+    --p2:#175cd3; --p2-soft:#eff6ff;
+    --ok:#067647; --ok-soft:#ecfdf3;
+    --radius:10px;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:15px; line-height:1.72; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px 80px}
+  /* ---------- header ---------- */
+  header{
+    background:var(--surface); border-bottom:1px solid var(--border);
+    padding:38px 0 30px; margin-bottom:32px;
+  }
+  header .wrap{padding-bottom:0}
+  .eyebrow{font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--brand);font-weight:600;margin-bottom:12px}
+  h1{font-size:30px;line-height:1.3;margin:0 0 12px;letter-spacing:-.01em}
+  .sub{color:var(--muted);font-size:15px;max-width:760px;margin:0}
+  .meta{margin-top:20px;display:flex;gap:10px;flex-wrap:wrap}
+  .chip{
+    font-size:12.5px;padding:5px 11px;border-radius:999px;
+    background:var(--surface-2);border:1px solid var(--border);color:var(--muted)
+  }
+  /* ---------- layout ---------- */
+  .cols{display:grid;grid-template-columns:212px 1fr;gap:36px;align-items:start}
+  nav.toc{position:sticky;top:24px;font-size:13.5px}
+  nav.toc a{
+    display:block;color:var(--muted);text-decoration:none;padding:6px 12px;
+    border-left:2px solid transparent;border-radius:0 6px 6px 0;transition:.15s
+  }
+  nav.toc a:hover{color:var(--brand);background:var(--brand-soft);border-left-color:var(--brand)}
+  nav.toc .grp{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);padding:16px 12px 6px;font-weight:600}
+  main{min-width:0}
+  /* ---------- typography ---------- */
+  h2{
+    font-size:21px;margin:52px 0 6px;letter-spacing:-.01em;scroll-margin-top:20px;
+    padding-bottom:12px;border-bottom:1px solid var(--border)
+  }
+  h2:first-child{margin-top:0}
+  h3{font-size:16.5px;margin:34px 0 10px;color:var(--text)}
+  h4{font-size:14.5px;margin:22px 0 8px;color:var(--muted);font-weight:600}
+  p{margin:10px 0}
+  ul,ol{margin:10px 0;padding-left:22px}
+  li{margin:5px 0}
+  strong{font-weight:640}
+  code{
+    font-family:var(--mono);font-size:12.5px;background:var(--surface-2);
+    border:1px solid var(--border);border-radius:4px;padding:1.5px 5px
+  }
+  a{color:var(--brand)}
+  /* ---------- cards ---------- */
+  .card{
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:20px 22px;margin:16px 0
+  }
+  .card.tight{padding:16px 18px}
+  .card h4{margin-top:0}
+  .callout{
+    border-left:3px solid var(--brand);background:var(--brand-soft);
+    border-radius:0 var(--radius) var(--radius) 0;padding:14px 18px;margin:18px 0
+  }
+  .callout.danger{border-left-color:var(--p0);background:var(--p0-soft)}
+  .callout.warn{border-left-color:var(--p1);background:var(--p1-soft)}
+  .callout.ok{border-left-color:var(--ok);background:var(--ok-soft)}
+  .callout .lbl{font-weight:660;font-size:13px;letter-spacing:.04em;display:block;margin-bottom:4px}
+  .callout.danger .lbl{color:var(--p0)}
+  .callout.warn .lbl{color:var(--p1)}
+  .callout.ok .lbl{color:var(--ok)}
+  .callout p:first-of-type{margin-top:0}
+  .callout p:last-child{margin-bottom:0}
+  /* ---------- table ---------- */
+  .tbl-scroll{overflow-x:auto;margin:16px 0;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface)}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:640px}
+  th{
+    text-align:left;font-weight:640;font-size:12.5px;letter-spacing:.04em;
+    background:var(--surface-2);color:var(--muted);padding:11px 14px;
+    border-bottom:1px solid var(--border-strong);white-space:nowrap
+  }
+  td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.62}
+  tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:var(--surface-2)}
+  td.nowrap{white-space:nowrap}
+  /* ---------- badges ---------- */
+  .badge{
+    display:inline-block;font-size:11.5px;font-weight:660;padding:2px 8px;border-radius:5px;
+    line-height:1.6;white-space:nowrap
+  }
+  .b-p0{background:var(--p0-soft);color:var(--p0);border:1px solid #fecdca}
+  .b-p1{background:var(--p1-soft);color:var(--p1);border:1px solid #fedf89}
+  .b-p2{background:var(--p2-soft);color:var(--p2);border:1px solid #bfdbfe}
+  .b-ok{background:var(--ok-soft);color:var(--ok);border:1px solid #abefc6}
+  .b-neutral{background:var(--surface-2);color:var(--muted);border:1px solid var(--border)}
+  .b-no{background:var(--p0-soft);color:var(--p0);border:1px solid #fecdca}
+  .b-part{background:var(--p1-soft);color:var(--p1);border:1px solid #fedf89}
+  .b-yes{background:var(--ok-soft);color:var(--ok);border:1px solid #abefc6}
+  /* ---------- misc blocks ---------- */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin:20px 0}
+  .kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px}
+  .kpi .n{font-size:24px;font-weight:680;letter-spacing:-.02em;line-height:1.25}
+  .kpi .l{font-size:12.5px;color:var(--muted);margin-top:4px}
+  .kpi.d .n{color:var(--p0)}
+  .kpi.w .n{color:var(--p1)}
+  .kpi.g .n{color:var(--ok)}
+  pre{
+    background:#12161c;color:#e6edf3;border-radius:var(--radius);padding:16px 18px;
+    overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7;margin:14px 0
+  }
+  pre .c{color:#7d8590}
+  pre .k{color:#79c0ff}
+  .phase{
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:0;margin:14px 0;overflow:hidden
+  }
+  .phase-h{
+    display:flex;align-items:center;gap:12px;padding:14px 18px;
+    background:var(--surface-2);border-bottom:1px solid var(--border)
+  }
+  .phase-h .tag{
+    font-family:var(--mono);font-size:11.5px;font-weight:660;color:var(--brand);
+    background:var(--brand-soft);padding:2px 8px;border-radius:5px
+  }
+  .phase-h .t{font-weight:640;font-size:15px}
+  .phase-h .w{margin-left:auto;font-size:12.5px;color:var(--faint);white-space:nowrap}
+  .phase-b{padding:14px 18px}
+  .phase-b ul{margin:0;padding-left:20px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .svg-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin:18px 0;overflow-x:auto}
+  hr{border:none;border-top:1px solid var(--border);margin:36px 0}
+  footer{color:var(--faint);font-size:12.5px;margin-top:56px;padding-top:22px;border-top:1px solid var(--border)}
+  @media(max-width:880px){
+    .cols{grid-template-columns:1fr;gap:0}
+    nav.toc{display:none}
+    .grid2{grid-template-columns:1fr}
+    h1{font-size:24px}
+    .wrap{padding:0 18px 60px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="eyebrow">Product Research &amp; Roadmap</div>
+    <h1>内容管理与多平台自动发布平台</h1>
+    <p class="sub">竞品调研 + 可行性研判 + 分阶段开发计划。核心结论前置：本项目的技术难点不在工程，而在<strong>平台侧的发布权限与合规红线</strong>——它决定了产品必须被设计成「半自动」而非「全自动」。</p>
+    <div class="meta">
+      <span class="chip">📅 2026-09-17</span>
+      <span class="chip">🎯 v1.0 范围冻结</span>
+      <span class="chip">目标平台：微信公众号 · 小红书</span>
+      <span class="chip">技术栈偏好：Python + Vue3</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+<div class="cols">
+
+<nav class="toc">
+  <div class="grp">结论</div>
+  <a href="#s0">核心研判</a>
+  <a href="#s1">平台发布能力边界</a>
+  <div class="grp">一、竞品调研</div>
+  <a href="#s2">多平台分发工具</a>
+  <a href="#s3">公众号排版编辑器</a>
+  <a href="#s4">海外社媒调度器</a>
+  <a href="#s5">内容管理底座</a>
+  <a href="#s6">开源同步方案</a>
+  <a href="#s7">市场空白与定位</a>
+  <div class="grp">二、开发计划</div>
+  <a href="#s8">技术选型</a>
+  <a href="#s9">核心模块</a>
+  <a href="#s10">依赖关系</a>
+  <a href="#s11">阶段与里程碑</a>
+  <a href="#s12">优先级排序</a>
+  <div class="grp">三、补全</div>
+  <a href="#s13">建议补充功能</a>
+  <a href="#s14">风险登记册</a>
+  <a href="#s15">下一步行动</a>
+</nav>
+
+<main>
+
+<!-- ============ 核心研判 ============ -->
+<h2 id="s0">核心研判</h2>
+
+<div class="kpis">
+  <div class="kpi d"><div class="n">2 个 P0</div><div class="l">合规红线，触之即封号</div></div>
+  <div class="kpi w"><div class="n">半自动</div><div class="l">唯一可行的产品形态</div></div>
+  <div class="kpi g"><div class="n">3 套</div><div class="l">渲染目标（微信HTML/图集/长图）</div></div>
+  <div class="kpi"><div class="n">10–12 周</div><div class="l">到 v1.0（不含资质等待）</div></div>
+</div>
+
+<div class="callout danger">
+  <span class="lbl">P0 · 结论一：全自动发布这条路，在国内主流平台已被政策封死</span>
+  <p><strong>微信公众号</strong>：2025 年 7 月起，微信官方回收了<strong>个人主体账号、企业未认证账号</strong>的 <code>freepublish/submit</code>（发布）接口权限。个人订阅号现在通过 API 最多只能把文章推进<strong>草稿箱</strong>，最后一下「群发」必须人到后台点。服务号（认证）与已认证企业订阅号不受影响。</p>
+  <p><strong>小红书</strong>：官方开放平台的笔记发布接口仅面向通过资质审核的企业主体/品牌/服务商开放；且 2026 年 AI 治理规则明确把「AI 工具自动生成笔记、自动定时发布」列为<strong>红线行为</strong>，判定即限流、禁言 7–30 天，重度（全账号 AI 托管）直接永久封禁并<strong>连带同设备/同实名矩阵账号</strong>。</p>
+  <p>⇒ 你的需求 [4]「生成内容可自动推送至目标平台」必须重新定义：<strong>推送 ≠ 发布</strong>。产品应交付「一键推送到草稿箱 / 一键生成可发布的素材包」，发布动作保留人工确认。</p>
+</div>
+
+<div class="callout ok">
+  <span class="lbl">结论二：这恰恰是市场空白，不是退路</span>
+  <p>市面上的工具是割裂的：<strong>排版工具</strong>（135编辑器/秀米）只管把一篇文章排得好看；<strong>分发工具</strong>（蚁小二/融媒宝/Wechatsync）只管把成品搬运到各平台；<strong>CMS</strong>（Strapi/Payload）只管存结构化数据。没有人做<strong>「结构化主题资产 → 多版式渲染 → 各平台合规产物 → 通道投递」</strong>这条完整流水线。</p>
+  <p>你的差异化正在于此：以「主题」为核心资产（而非以「文章」为核心），一份素材自动派生公众号长文 + 小红书图集 + 长图三种形态。分发工具做不到这点，因为它们没有内容模型。</p>
+</div>
+
+<div class="callout warn">
+  <span class="lbl">结论三：真正的技术难点是渲染引擎，不是发布</span>
+  <p>三个目标平台的产物形态完全不同，必须抽象成一个版式中间层：</p>
+  <ul style="margin-bottom:0">
+    <li><strong>微信公众号</strong>：只能接受<strong>内联样式</strong>的 HTML，外部图片链接一律不显示（必须先用素材接口转存到 <code>mmbiz.qpic.cn</code>），class 会被清洗；「左右轮播」需用 SVG 交互实现，而 SVG 在部分场景不稳，需图集兜底。</li>
+    <li><strong>小红书</strong>：只接受<strong>图片/视频</strong>，不接受 HTML。「左右轮播」是原生能力（多图集，≤18 图）；「上下展示」要拼接成<strong>长图</strong>。所以必须有一条 <code>HTML → PNG</code> 的卡片渲染管线（Playwright 截图）。</li>
+    <li><strong>通用 HTML</strong>：用于站内预览、导出、第三方站点。</li>
+  </ul>
+</div>
+
+<!-- ============ 平台边界 ============ -->
+<h2 id="s1">平台发布能力边界（实测口径）</h2>
+
+<p>这是整个项目的可行性基线，建议做成产品内的「能力矩阵」直接展示给用户，避免他们误以为平台不支持是产品缺陷。</p>
+
+<div class="tbl-scroll">
+<table>
+<thead>
+<tr><th>能力项</th><th>个人订阅号</th><th>认证企业订阅号</th><th>认证服务号</th><th>小红书</th></tr>
+</thead>
+<tbody>
+<tr><td class="nowrap">获取 access_token</td><td><span class="badge b-yes">可用</span></td><td><span class="badge b-yes">可用</span></td><td><span class="badge b-yes">可用</span></td><td><span class="badge b-part">需资质</span></td></tr>
+<tr><td class="nowrap">上传封面/正文图</td><td><span class="badge b-yes">可用</span></td><td><span class="badge b-yes">可用</span></td><td><span class="badge b-yes">可用</span></td><td><span class="badge b-part">素材接口</span></td></tr>
+<tr><td class="nowrap">新建草稿 <code>draft/add</code></td><td><span class="badge b-yes">可用</span></td><td><span class="badge b-yes">可用</span></td><td><span class="badge b-yes">可用</span></td><td><span class="badge b-no">无草稿概念</span></td></tr>
+<tr><td class="nowrap">提交发布 <code>freepublish/submit</code></td><td><span class="badge b-no">已回收（2025.07）</span></td><td><span class="badge b-yes">可用</span></td><td><span class="badge b-yes">可用</span></td><td><span class="badge b-no">严禁第三方自动发布</span></td></tr>
+<tr><td class="nowrap">自定义菜单</td><td><span class="badge b-no">无权限</span></td><td><span class="badge b-yes">可用</span></td><td><span class="badge b-yes">可用</span></td><td>—</td></tr>
+<tr><td class="nowrap">数据统计接口</td><td><span class="badge b-no">无权限</span></td><td><span class="badge b-yes">可用</span></td><td><span class="badge b-yes">可用</span></td><td><span class="badge b-part">仅商家/服务商</span></td></tr>
+<tr><td class="nowrap">群发频率上限</td><td>1 次/天</td><td>1 次/天</td><td>4 次/月</td><td>无硬性次数，受风控节奏约束</td></tr>
+<tr><td class="nowrap">第三方发布合规性</td><td>—</td><td><span class="badge b-yes">合规</span></td><td><span class="badge b-yes">合规</span></td><td><span class="badge b-no">违规，判罚不依赖抓工具证据</span></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout warn">
+  <span class="lbl">关键推论 · 请重点确认</span>
+  <p>如果你的目标账号是<strong>个人订阅号</strong>，那么公众号侧的产品承诺只能是「<strong>一键推送草稿箱 + 后台一键发布</strong>」，把 AI 能做的 90% 自动化、保留 10% 人工确认。小红书的自动发布则<strong>明确建议不做</strong>——连浏览器插件式模拟发布都应回避，因为小红书的风控判定看的是「行为特征」（话术模板化、发布间隔固定、多账号雷同），而不是「是否用了某个工具」，无法通过技术手段规避。产品应改为输出<strong>「小红书素材包」</strong>（图集 PNG + 标题 + 正文 + 话题标签，一键下载/ZIP 导出），由用户在官方创作服务平台发布。</p>
+</div>
+
+<!-- ============ 竞品调研 ============ -->
+<h2 id="s2">一、同类产品调研</h2>
+
+<h3>1.1 国内多平台分发工具（最直接的竞品）</h3>
+<p>特征：均为「成品搬运工」，不做内容建模，只做多账号批量投递。定价普遍走「免费额度 + 账号数阶梯」。</p>
+
+<div class="tbl-scroll">
+<table>
+<thead>
+<tr><th>产品</th><th>形态</th><th>核心功能</th><th>定价模式</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td class="nowrap"><strong>蚁小二</strong></td>
+  <td>桌面客户端<br>(Win/Mac/移动)</td>
+  <td>40+ 平台（视频 32+/图文 8+/文章 21+）；矩阵多账号管理、批量发布、错峰定时、AI 视频创作、数据统计、环境隔离</td>
+  <td>免费版 3–5 账号（试用 7 天）；20 账号约 50 元/月、480–598 元/年；50 账号 1,794 元/年</td>
+</tr>
+<tr>
+  <td class="nowrap"><strong>融媒宝</strong></td>
+  <td>Windows 桌面</td>
+  <td>50+ 平台；图文分发最强，视频比例自动适配，公众号多账号发文模板丰富，跨平台数据汇总</td>
+  <td>免费版 10 账号；进阶 39 元/月，年付 228–468 元</td>
+</tr>
+<tr>
+  <td class="nowrap"><strong>易媒助手</strong></td>
+  <td>桌面</td>
+  <td>70+ 平台；AI 差异化文案与话题生成、云端素材库、流量高峰时段推荐、账号无上限</td>
+  <td>15 账号年费约 1,200 元；定位大型团队，成本最高</td>
+</tr>
+<tr>
+  <td class="nowrap"><strong>聚媒通</strong></td>
+  <td>桌面</td>
+  <td>40+ 平台；IP/指纹隔离防关联（核心卖点）、不限次批量发布、按门店/平台拆分数据复盘</td>
+  <td>基础版 30 元/月、150 元/年（20 账号）；IP 隔离版 488 / 788 / 1,288 元/年</td>
+</tr>
+<tr>
+  <td class="nowrap"><strong>新榜 / 新榜小豆芽</strong></td>
+  <td>Web SaaS</td>
+  <td>全平台分发 + 内容合规检测；公众号/小红书/视频号批量自动发布；指纹浏览器隔离</td>
+  <td>免费 20 账号（图文）；付费 59 元/月、588 元/年；SVIP 79 元/月起</td>
+</tr>
+<tr>
+  <td class="nowrap"><strong>新媒体管家</strong></td>
+  <td>浏览器插件</td>
+  <td>公众号后台内嵌排版、图集/视频批量分发、数据看板</td>
+  <td>5 账号免费；45 元/月、360 元/年（图集/视频分发需另购增值包）</td>
+</tr>
+<tr>
+  <td class="nowrap"><strong>简媒</strong></td>
+  <td>Web / 轻量</td>
+  <td>图文一键发布 + 自动排版配图 + 合规话题自动抓取 + 基础数据报表</td>
+  <td>免费额度 + 付费版；短视频能力弱</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p><strong>可借鉴</strong>：账号数阶梯定价、IP/环境隔离（多账号防关联是刚需且愿意付费）、发布失败重试与「合规检测」前置。<br>
+<strong>它们的短板</strong>：全部以「内容成品」为输入，没有内容资产模型；无法做到「一份主题资产 → 多平台差异化产物」；版本迭代依赖逆向平台接口，脆弱且 3 天一崩。</p>
+
+<h3 id="s3">1.2 公众号排版编辑器（内容生成侧的竞品）</h3>
+
+<div class="tbl-scroll">
+<table>
+<thead>
+<tr><th>产品</th><th>形态</th><th>核心功能</th><th>定价模式</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td class="nowrap"><strong>135 编辑器</strong></td>
+  <td>Web 在线编辑器</td>
+  <td>10 万+ 模板库、一键智能排版、SVG 互动效果、AI 生文生图、版权素材库、授权绑定公众号（最多 20 个）、公众号长图导出、多平台同步、云端草稿、团队协作</td>
+  <td>免费版；个人会员 8 / 20 / 62 元/月三档（标准/高级/超级）；企业版 3,390–7,600 元/年；定制报价</td>
+</tr>
+<tr>
+  <td class="nowrap"><strong>秀米</strong></td>
+  <td>Web 在线编辑器</td>
+  <td>模块化自由排版、原创模板（文艺/时尚/商务）、SVG 动画与交互组件、云端草稿多端同步、长文分栏与目录定位</td>
+  <td>基础免费；会员约 15 元/月（等级会员 + 模板会员分设）</td>
+</tr>
+<tr>
+  <td class="nowrap"><strong>壹伴助手</strong></td>
+  <td>浏览器插件</td>
+  <td>公众号后台内嵌 AI 排版（记忆用户排版习惯）、违规词检测、错别字纠错、智能配图、阅读数据追踪</td>
+  <td>插件免费；增值 19 元/月起；会员 199–999 元/年</td>
+</tr>
+<tr>
+  <td class="nowrap"><strong>小墨鹰编辑器</strong></td>
+  <td>Web</td>
+  <td>全流程 AI 创作（大纲→撰写→排版→配图）、25 万+素材、长文分拆、多图文批量排版、动态效果</td>
+  <td>免费试用；银牌→企业版 32.9–179 元/月</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p><strong>可借鉴</strong>：模板即产品（模板库大小直接决定付费转化）；「授权绑定公众号」的账号配额本身就是定价杠杆；长图导出是刚需功能。<br>
+<strong>短板</strong>：只服务公众号单一渠道，小红书完全不在射程内；以「一篇文章」为编辑单位，无法管理「图片+说明+来源+时期」这类结构化附件。</p>
+
+<h3 id="s4">1.3 海外社媒调度器（产品设计参考）</h3>
+
+<div class="tbl-scroll">
+<table>
+<thead>
+<tr><th>产品</th><th>核心功能</th><th>定价模式</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td class="nowrap"><strong>Postiz</strong></td>
+  <td>30+ 渠道；AI copilot 生成文案与配图、类 Canva 设计编辑器、可视化日历、团队协作、Public API + Webhooks、n8n/Make/Zapier 集成、重复发布</td>
+  <td>自托管<strong>免费</strong>（AGPL-3.0，功能对齐云版）；云版 $29（5 渠道）/ $39（10）/ $49（30）/ $99（100）每月</td>
+</tr>
+<tr>
+  <td class="nowrap"><strong>Mixpost</strong></td>
+  <td>11 个平台、无限账号；审批工作流、多租户工作区、变量与模板、AI 助手、16+ 语言</td>
+  <td>Lite 免费开源（仅 Facebook/X/Mastodon）；Pro <strong>一次性 $299</strong>；Enterprise 一次性 $1,199</td>
+</tr>
+<tr>
+  <td class="nowrap"><strong>Publer</strong></td>
+  <td>12+ 平台；CSV 批量上传、常青内容自动回收、GPT-4 文案 + DALL·E 配图、RSS 自动发布、Canva 内嵌、链接追踪</td>
+  <td>免费 3 账号；Professional $5 / Business $10 每月</td>
+</tr>
+<tr>
+  <td class="nowrap"><strong>Buffer</strong></td>
+  <td>老牌调度器；RSS→社媒、基础分析、简洁队列</td>
+  <td>免费版；付费约 $5–6 /渠道/月</td>
+</tr>
+<tr>
+  <td class="nowrap"><strong>Hootsuite</strong></td>
+  <td>企业级协作、审批流、分析看板、RSS→社媒</td>
+  <td>$100+/月起，按席位与账号计费</td>
+</tr>
+<tr>
+  <td class="nowrap"><strong>SocialBee</strong></td>
+  <td>内容回收引擎（常青内容自动重排队）、分类队列</td>
+  <td>$29/月（5 profiles/1 用户）→ $49（10）→ $99（25 + 3 用户）；加席位 $10/月</td>
+</tr>
+<tr>
+  <td class="nowrap"><strong>Typefully</strong></td>
+  <td>LinkedIn / X 长线程编辑、AI 语气匹配</td>
+  <td>约 $12/月</td>
+</tr>
+<tr>
+  <td class="nowrap"><strong>FeedHive</strong></td>
+  <td>效果驱动的内容回收、AI 短文案</td>
+  <td>约 $19/月起</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout">
+  <span class="lbl">值得抄的两个设计</span>
+  <p><strong>① 一次性买断 vs 订阅的定价张力。</strong>Mixpost 的 $299 买断 + 1 年更新 + 永久回退许可，是中小团队最买账的模式。国内 135 编辑器用「年费 + 绑定账号数」达到同样效果。你可以设计成「基础版订阅 + 模板包买断」。</p>
+  <p><strong>② Postiz 的 Agent 化路线。</strong>它已被定位为「agentic social media scheduler」，开放 Public API / Webhooks / n8n / MCP，把自己变成 AI 工作流里的一个节点。你的产品天然适合这个定位——主题资产就是给 Agent 消费的结构化物料。</p>
+</div>
+
+<h3 id="s5">1.4 内容管理底座（Headless CMS，自建 vs 采购）</h3>
+
+<div class="tbl-scroll">
+<table>
+<thead>
+<tr><th>产品</th><th>定位与强项</th><th>自托管</th><th>云版定价</th><th>许可陷阱</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td class="nowrap"><strong>Payload</strong></td>
+  <td>TypeScript-first，Next.js 原生内嵌，Local API 无 HTTP 开销，代码即 Schema 可版本控制</td>
+  <td>免费</td>
+  <td>Standard $35/月，Pro $199/月</td>
+  <td>MIT，无收入门槛</td>
+</tr>
+<tr>
+  <td class="nowrap"><strong>Strapi</strong></td>
+  <td>插件生态最大、招聘池最大，Content-Type Builder 可视化建模，最「安全」的默认选择</td>
+  <td>免费</td>
+  <td>约 $29–99/月起（用量计费）</td>
+  <td>MIT（v5 条款需复核）</td>
+</tr>
+<tr>
+  <td class="nowrap"><strong>Directus</strong></td>
+  <td>直接对接已有 SQL 库，数据浏览器 UI 最友好，零厂商锁定（卸载后数据原地不动）</td>
+  <td>免费</td>
+  <td>Professional $99/月</td>
+  <td><span class="badge b-p1">BSL：年收入 ≥ $5M 需商业授权</span></td>
+</tr>
+<tr>
+  <td class="nowrap"><strong>Sanity</strong></td>
+  <td>Portable Text + GROQ 解决富文本建模，实时协作最强，Content Agent</td>
+  <td>—</td>
+  <td>免费（≤20 席位，仅公开数据集）；Growth $15/席位/月</td>
+  <td>免费版不能建私有数据集</td>
+</tr>
+<tr>
+  <td class="nowrap"><strong>Contentful</strong></td>
+  <td>企业级本地化与变更治理，最偏企业</td>
+  <td>—</td>
+  <td>免费 Starter；Lite / Premium 需询价</td>
+  <td>API 调用量与空间数硬限制</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p><strong>对项目的判断</strong>：不建议直接套用 CMS 作为主存储。<strong>Directus 和 Payload 值得认真评估</strong>——Directus 能让你把「主题 / 附件 / 图片」的建表与管理后台在 1 天内跑通（省掉整个 M2 模块的 CRUD 开发），Payload 则适合你如果选 Next.js 全栈。但<strong>渲染引擎、发布通道、凭证管理这三块必须自研</strong>，任何 CMS 都不提供。建议路径：先用 Directus/Payload 快速搭出主题管理后台验证数据模型，再决定是否替换为自研后台。</p>
+
+<h3 id="s6">1.5 开源 / 免费同步方案（技术路径参考）</h3>
+
+<div class="tbl-scroll">
+<table>
+<thead>
+<tr><th>产品</th><th>技术原理</th><th>覆盖</th><th>关键设计取舍</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td class="nowrap"><strong>Wechatsync</strong><br><span style="color:var(--faint);font-size:12px">文章同步助手</span></td>
+  <td>Chrome 扩展读取浏览器已登录 Cookie → 用 <code>credentials:'include'</code> 调用各平台<strong>官方 Web API</strong>（与手动操作无异）；不做模拟登录、不经过第三方服务器；需 CSRF 时先从编辑页提取 token，用 <code>declarativeNetRequest</code> 注入 Origin/Referer</td>
+  <td>29–31 平台：微信、知乎、小红书、掘金、CSDN、微博、头条、B站、雪球、WordPress…</td>
+  <td><span class="badge b-ok">默认只存草稿，不自动发布</span> 这是它敢开源的核心风控设计。提供 CLI + MCP，可被 Agent 编排</td>
+</tr>
+<tr>
+  <td class="nowrap"><strong>MultiPost Extension</strong></td>
+  <td>浏览器扩展，智能内容抓取 + RESTful API，无需登录注册</td>
+  <td>知乎、微博、小红书、抖音、快手、掘金、CSDN、B站</td>
+  <td>免费开源；同样只做投递不做发布</td>
+</tr>
+<tr>
+  <td class="nowrap"><strong>TurboPush</strong></td>
+  <td>跨平台桌面客户端</td>
+  <td>20 平台（图文/视频/文章），定时发布、数据分析、平台模板</td>
+  <td>免费；覆盖面小于 Wechatsync 但支持视频</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout ok">
+  <span class="lbl">对本项目最重要的借鉴：本地浏览器通道</span>
+  <p>Wechatsync 给出了一条<strong>绕开开放平台资质门槛</strong>的合规路径：把「发布执行」下沉到用户本地浏览器（扩展 / 本地代理），让平台看到的是正常浏览器请求而非服务器 IP 批量调用。</p>
+  <p>对你的产品来说，这可以设计成一个 <strong>「本地投递代理（Local Bridge）」</strong>：服务端生成物料 → 本地代理承接 → 调用平台前台接口写入草稿箱。这既解决了公众号个人号的草稿投递，也把凭证（Cookie）留在用户机器上、不必落库——<strong>同时解决了合规与安全两个问题</strong>。建议列为 P1 核心架构决策之一。</p>
+</div>
+
+<h3 id="s7">1.6 市场空白与定位结论</h3>
+
+<div class="tbl-scroll">
+<table>
+<thead>
+<tr><th>能力</th><th>排版编辑器</th><th>分发工具</th><th>Headless CMS</th><th>海外调度器</th><th><strong>本项目</strong></th></tr>
+</thead>
+<tbody>
+<tr><td>结构化主题资产（多图+说明+来源+时期）</td><td><span class="badge b-no">✕</span></td><td><span class="badge b-no">✕</span></td><td><span class="badge b-part">△ 通用</span></td><td><span class="badge b-no">✕</span></td><td><span class="badge b-yes">✓ 原生</span></td></tr>
+<tr><td>一主题 → 多版式</td><td><span class="badge b-no">✕</span></td><td><span class="badge b-no">✕</span></td><td><span class="badge b-no">✕</span></td><td><span class="badge b-no">✕</span></td><td><span class="badge b-yes">✓ 核心</span></td></tr>
+<tr><td>公众号 HTML 渲染（内联样式）</td><td><span class="badge b-yes">✓</span></td><td><span class="badge b-no">✕</span></td><td><span class="badge b-no">✕</span></td><td><span class="badge b-no">✕</span></td><td><span class="badge b-yes">✓</span></td></tr>
+<tr><td>小红书图集/长图生成</td><td><span class="badge b-no">✕</span></td><td><span class="badge b-part">△ 仅搬运</span></td><td><span class="badge b-no">✕</span></td><td><span class="badge b-no">✕</span></td><td><span class="badge b-yes">✓ 核心</span></td></tr>
+<tr><td>多平台账号凭证复用</td><td><span class="badge b-part">△ 绑定后台</span></td><td><span class="badge b-yes">✓</span></td><td><span class="badge b-no">✕</span></td><td><span class="badge b-yes">✓</span></td><td><span class="badge b-yes">✓</span></td></tr>
+<tr><td>合规前置（敏感词/AI标识/频率）</td><td><span class="badge b-part">△ 仅违规词</span></td><td><span class="badge b-part">△ 部分</span></td><td><span class="badge b-no">✕</span></td><td><span class="badge b-no">✕</span></td><td><span class="badge b-yes">✓ 必做</span></td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="card tight" style="margin-top:18px"><strong>一句话定位</strong>：不做「又一个一键分发工具」，做 <strong>「选题资产工作台（Topic Asset Studio）」</strong>——把一次选题的资料、图片、说明沉淀成可复用资产，再以版式引擎派生各平台合规产物。你的竞争对手不是蚁小二，是「运营者脑子里那份记不住放哪的选题素材 + 135编辑器 + 手动搬运」这个组合。</p>
+
+<!-- ============ 开发计划 ============ -->
+<h2 id="s8">二、开发计划</h2>
+
+<h3>2.1 技术选型建议</h3>
+
+<div class="tbl-scroll">
+<table>
+<thead>
+<tr><th>层次</th><th>选型</th><th>理由 / 备选</th></tr>
+</thead>
+<tbody>
+<tr><td class="nowrap">后端</td><td><strong>Python 3.12 + FastAPI</strong></td><td>与你现有 stockapi 生态一致；LLM 编排（DeepSeek）库成熟；Jinja2 天然适合版式模板。备选：NestJS（若前端主导）</td></tr>
+<tr><td class="nowrap">前端</td><td><strong>Vue 3 + Vite + Pinia + Naive UI</strong></td><td>延续你现有 Vue 经验（stockInfo.vue / service.js）。备选：React + shadcn</td></tr>
+<tr><td class="nowrap">版式引擎</td><td><strong>Jinja2（服务端渲染）+ Layout JSON DSL</strong></td><td>模板可版本化、可热更新；DSL 描述「区块 + 版式」，与渲染目标解耦</td></tr>
+<tr><td class="nowrap">图片渲染</td><td><strong>Playwright（Chromium）截图</strong></td><td>HTML → 1080×1440 卡片、长图拼接。⚠️ 必须做字体预加载与 <code>waitForFonts</code>，否则中文丢字</td></tr>
+<tr><td class="nowrap">任务队列</td><td><strong>Celery + Redis</strong>（或 Arq）</td><td>发布任务需异步、可重试、可回查；微信发布本身就是异步任务 + 回调</td></tr>
+<tr><td class="nowrap">数据库</td><td><strong>PostgreSQL 15</strong>（或 MySQL 8）</td><td>延续你的约定：<strong>ID 字段统一 VARCHAR(200)</strong>，URL 类字段抽象为 File ID，后端负责 ID → URL 转换</td></tr>
+<tr><td class="nowrap">对象存储</td><td><strong>S3 兼容</strong>（R2 / MinIO / OSS）</td><td>媒体与数据库分离，备份简单。避免首期把图片放本地磁盘</td></tr>
+<tr><td class="nowrap">凭证加密</td><td><strong>AES-256-GCM + 独立密钥管理</strong></td><td>AppSecret / Token / Cookie 绝不明文落库；密钥放环境变量或 KMS，不进代码库</td></tr>
+<tr><td class="nowrap">本地代理</td><td>浏览器扩展 或 本地 CLI（P1）</td><td>承接 Cookie 态投递，凭证不出用户机器</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 id="s9">2.2 核心模块清单</h3>
+
+<div class="tbl-scroll">
+<table>
+<thead>
+<tr><th>编号</th><th>模块</th><th>职责</th><th>优先级</th></tr>
+</thead>
+<tbody>
+<tr><td class="nowrap"><code>M1</code></td><td><strong>用户与权限</strong></td><td>登录、工作区、角色（编辑/审核/发布）、操作审计</td><td><span class="badge b-p1">P1</span></td></tr>
+<tr><td class="nowrap"><code>M2</code></td><td><strong>主题管理</strong></td><td>标题/简介/详述/作者/地点/来源/时期/封面 + 多图附件（每图带说明）。内容模型是本项目的产品资产核心</td><td><span class="badge b-p0">P0</span></td></tr>
+<tr><td class="nowrap"><code>M3</code></td><td><strong>素材与图片库</strong></td><td>上传、裁剪、压缩、封面生成（微信 900×500、小红书 3:4）、水印、File ID 抽象、CDN 分发</td><td><span class="badge b-p0">P0</span></td></tr>
+<tr><td class="nowrap"><code>M4</code></td><td><strong>AI 内容生成</strong></td><td>基于主题资产生成平台差异化文案：公众号长文 / 小红书短文+话题标签 / 封面标题 / 图片配文</td><td><span class="badge b-p0">P0</span></td></tr>
+<tr><td class="nowrap"><code>M5</code></td><td><strong>版式模板引擎</strong></td><td>Layout DSL + 模板库（上下展示 / 左右轮播 / 图文卡片）；可视化预览；模板变量注入</td><td><span class="badge b-p0">P0</span></td></tr>
+<tr><td class="nowrap"><code>M6</code></td><td><strong>平台适配层</strong></td><td><code>WeChatRenderer</code>（内联样式 HTML + 图片转 CDN）/ <code>XhsRenderer</code>（图集 PNG + 长图）/ <code>GenericRenderer</code>（站内/导出）</td><td><span class="badge b-p0">P0</span></td></tr>
+<tr><td class="nowrap"><code>M7</code></td><td><strong>发布通道与任务队列</strong></td><td>草稿投递/正式发布、定时、幂等键、失败重试、发布结果回查与事件回调</td><td><span class="badge b-p0">P0</span></td></tr>
+<tr><td class="nowrap"><code>M8</code></td><td><strong>账号凭证管理</strong></td><td>多平台多账号凭据加密存储、Token 自动刷新、有效期监控与告警、账号健康检查、平台能力矩阵展示</td><td><span class="badge b-p0">P0</span></td></tr>
+<tr><td class="nowrap"><code>M9</code></td><td><strong>合规与风控</strong></td><td>敏感词/违禁词检测、AI 生成内容标识（小红书强制）、发布频率限流、素材版权提示</td><td><span class="badge b-p0">P0</span></td></tr>
+<tr><td class="nowrap"><code>M10</code></td><td><strong>草稿箱与工作流</strong></td><td>多版本草稿、版本对比与回滚、审核流转（编辑→审核→发布）</td><td><span class="badge b-p1">P1</span></td></tr>
+<tr><td class="nowrap"><code>M11</code></td><td><strong>数据回收</strong></td><td>发布状态/文章链接回写；公众号数据统计接口拉取；小红书仅支持手工录入或服务商接口</td><td><span class="badge b-p2">P2</span></td></tr>
+<tr><td class="nowrap"><code>M12</code></td><td><strong>本地投递代理</strong></td><td>浏览器扩展 / 本地 CLI，承接 Cookie 态草稿投递（绕开开放平台资质门槛）</td><td><span class="badge b-p1">P1</span></td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 id="s10">2.3 依赖关系</h3>
+
+<p>下图是模块间的硬依赖。注意<strong>左侧红色链路是最长路径</strong>——平台资质申请是<strong>外部依赖</strong>，审核周期 2–4 周，必须在 Day 1 启动，否则会卡住整个 v1.0。</p>
+
+<div class="svg-box">
+<svg viewBox="0 0 680 452" width="100%" style="max-width:820px;display:block" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,Segoe UI,Microsoft YaHei,sans-serif">
+  <defs>
+    <marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#8b96a3"/>
+    </marker>
+    <marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#c0392b"/>
+    </marker>
+  </defs>
+
+  <!-- 外部依赖 -->
+  <rect x="14" y="14" width="200" height="52" rx="8" fill="#fef3f2" stroke="#d92d20" stroke-width="1.5"/>
+  <text x="28" y="36" font-size="12.5" font-weight="700" fill="#d92d20">外部依赖 · 最长路径</text>
+  <text x="28" y="54" font-size="12" fill="#7a271a">平台资质申请（2–4 周审核）</text>
+
+  <!-- 行 1 -->
+  <rect x="14" y="96" width="130" height="48" rx="8" fill="#eaf1fd" stroke="#1f5fd6" stroke-width="1.5"/>
+  <text x="26" y="117" font-size="12.5" font-weight="700" fill="#1f5fd6">M2 主题管理</text>
+  <text x="26" y="133" font-size="11" fill="#5c6672">内容模型</text>
+
+  <rect x="174" y="96" width="130" height="48" rx="8" fill="#eaf1fd" stroke="#1f5fd6" stroke-width="1.5"/>
+  <text x="186" y="117" font-size="12.5" font-weight="700" fill="#1f5fd6">M3 素材图库</text>
+  <text x="186" y="133" font-size="11" fill="#5c6672">File ID 抽象</text>
+
+  <rect x="334" y="96" width="130" height="48" rx="8" fill="#eaf1fd" stroke="#1f5fd6" stroke-width="1.5"/>
+  <text x="346" y="117" font-size="12.5" font-weight="700" fill="#1f5fd6">M4 AI 生成</text>
+  <text x="346" y="133" font-size="11" fill="#5c6672">平台差异化文案</text>
+
+  <rect x="494" y="96" width="172" height="48" rx="8" fill="#fff" stroke="#d0d5db" stroke-width="1.5"/>
+  <text x="506" y="117" font-size="12.5" font-weight="700" fill="#171a1f">M9 合规风控</text>
+  <text x="506" y="133" font-size="11" fill="#5c6672">前置拦截 · 全链路注入</text>
+
+  <!-- 行 2 -->
+  <rect x="174" y="194" width="130" height="48" rx="8" fill="#f0f9ff" stroke="#175cd3" stroke-width="1.5"/>
+  <text x="186" y="215" font-size="12.5" font-weight="700" fill="#175cd3">M5 版式引擎</text>
+  <text x="186" y="231" font-size="11" fill="#5c6672">Layout DSL</text>
+
+  <rect x="334" y="194" width="130" height="48" rx="8" fill="#f0f9ff" stroke="#175cd3" stroke-width="1.5"/>
+  <text x="346" y="215" font-size="12.5" font-weight="700" fill="#175cd3">M6 平台适配</text>
+  <text x="346" y="231" font-size="11" fill="#5c6672">微信HTML / 图集</text>
+
+  <!-- 行 3 -->
+  <rect x="334" y="292" width="130" height="48" rx="8" fill="#fff" stroke="#d0d5db" stroke-width="1.5"/>
+  <text x="346" y="313" font-size="12.5" font-weight="700" fill="#171a1f">M8 凭证管理</text>
+  <text x="346" y="329" font-size="11" fill="#5c6672">Token 刷新</text>
+
+  <rect x="494" y="292" width="172" height="48" rx="8" fill="#ecfdf3" stroke="#067647" stroke-width="1.5"/>
+  <text x="506" y="313" font-size="12.5" font-weight="700" fill="#067647">M7 发布通道</text>
+  <text x="506" y="329" font-size="11" fill="#5c6672">队列 · 重试 · 回调</text>
+
+  <rect x="494" y="194" width="172" height="48" rx="8" fill="#fafbfc" stroke="#d0d5db" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <text x="506" y="215" font-size="12.5" font-weight="700" fill="#5c6672">M12 本地投递代理</text>
+  <text x="506" y="231" font-size="11" fill="#8b96a3">P1 · Cookie 态投递</text>
+
+  <!-- 行 4 -->
+  <rect x="174" y="382" width="300" height="48" rx="8" fill="#fafbfc" stroke="#d0d5db" stroke-width="1.5"/>
+  <text x="186" y="403" font-size="12.5" font-weight="700" fill="#5c6672">M10 草稿工作流 · M11 数据回收</text>
+  <text x="186" y="419" font-size="11" fill="#8b96a3">P1 / P2 · 在主干之后</text>
+
+  <!-- 连线 -->
+  <path d="M144,120 L170,120" stroke="#8b96a3" stroke-width="1.4" marker-end="url(#ar)"/>
+  <path d="M304,120 L330,120" stroke="#8b96a3" stroke-width="1.4" marker-end="url(#ar)"/>
+  <path d="M239,144 L239,190" stroke="#8b96a3" stroke-width="1.4" marker-end="url(#ar)"/>
+  <path d="M239,242 L330,222" stroke="#8b96a3" stroke-width="1.4" marker-end="url(#ar)"/>
+  <path d="M399,242 L399,288" stroke="#8b96a3" stroke-width="1.4" marker-end="url(#ar)"/>
+  <path d="M464,218 L490,218" stroke="#8b96a3" stroke-width="1.4" marker-end="url(#ar)"/>
+  <path d="M580,242 L580,288" stroke="#8b96a3" stroke-width="1.4" marker-end="url(#ar)"/>
+  <path d="M464,316 L490,316" stroke="#8b96a3" stroke-width="1.4" marker-end="url(#ar)"/>
+  <path d="M114,38 L114,92" stroke="#c0392b" stroke-width="1.6" marker-end="url(#arr)"/>
+  <path d="M214,40 L330,92" stroke="#c0392b" stroke-width="1.6" marker-end="url(#arr)"/>
+  <path d="M239,290 L239,378" stroke="#8b96a3" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#ar)"/>
+  <path d="M464,316 L300,385" stroke="#8b96a3" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#ar)"/>
+  <path d="M494,316 L470,385" stroke="#8b96a3" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#ar)"/>
+  <path d="M580,144 L580,190" stroke="#8b96a3" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#ar)"/>
+
+  <text x="126" y="70" font-size="10.5" fill="#c0392b" font-weight="600">M8 凭证依赖资质</text>
+  <text x="244" y="66" font-size="10.5" fill="#c0392b" font-weight="600">发布能力依赖资质结果</text>
+  <text x="620" y="172" font-size="10.5" fill="#8b96a3">依赖</text>
+</svg>
+</div>
+
+<div class="callout danger">
+  <span class="lbl">关键路径提示</span>
+  <p>最长路径是：<strong>平台资质申请 → M8 凭证管理 → M7 发布通道</strong>。而 M2 → M3 → M5 → M6（内容与渲染主干）可以并行推进。因此建议<strong>双线并行</strong>：A 线做内容与渲染（技术自控，进度可预测），B 线同步推进资质与凭证（外部依赖，越早启动越好）。若 B 线被卡，A 线依然能交付「素材包导出」这一完整可用形态。</p>
+</div>
+
+<h3 id="s11">2.4 阶段划分与里程碑</h3>
+
+<div class="phase">
+  <div class="phase-h"><span class="tag">PHASE 0</span><span class="t">立项与地基</span><span class="w">第 1–2 周</span></div>
+  <div class="phase-b">
+    <ul>
+      <li><strong>立即启动</strong>：确认目标账号主体类型（个人 / 企业认证），并提交微信、小红书开放平台资质申请 —— 这是最长外部依赖</li>
+      <li>数据模型设计（主题 / 附件 / 图片 / 模板 / 成品 / 账号 / 发布任务），输出 <code>plan.md</code> 与 ER 图</li>
+      <li>技术选型定稿、仓库与 CI 搭建、对象存储与数据库开通</li>
+      <li>Layout DSL 语义设计：确认「上下展示 / 左右轮播」如何映射到三类渲染目标</li>
+    </ul>
+  </div>
+</div>
+
+<div class="phase">
+  <div class="phase-h"><span class="tag">PHASE 1</span><span class="t">MVP · 主题资产 + 渲染主干</span><span class="w">第 3–6 周</span><span class="badge b-p0">P0</span></div>
+  <div class="phase-b">
+    <ul>
+      <li><strong>M2</strong> 主题 CRUD（全字段 + 多图附件带说明）、列表/详情/搜索</li>
+      <li><strong>M3</strong> 图片上传与处理（压缩、裁剪、封面生成）、File ID 抽象、对象存储接入</li>
+      <li><strong>M5</strong> 版式引擎 v1：先<strong>硬编码 3 套模板</strong>（竖向图文 / 卡片轮播 / 多图集）验证，再抽 DSL</li>
+      <li><strong>M6</strong> 微信渲染器（内联样式 HTML）+ 站内预览（微信真机模拟、小红书手机框模拟）</li>
+      <li><strong>M9</strong> 合规基础版：敏感词库 + 检测接口</li>
+      <li>🎯 <strong>里程碑 M1「可看」</strong>：创建主题 → 上传图片 → 选版式 → 浏览器预览渲染结果</li>
+    </ul>
+  </div>
+</div>
+
+<div class="phase">
+  <div class="phase-h"><span class="tag">PHASE 2</span><span class="t">渠道打通 · 小红书管线 + 公众号投递</span><span class="w">第 7–10 周</span><span class="badge b-p0">P0</span></div>
+  <div class="phase-b">
+    <ul>
+      <li><strong>M4</strong> AI 内容生成：同一主题生成公众号长文 + 小红书短文案 + 话题标签，支持人工微调</li>
+      <li><strong>M6</strong> 小红书渲染器：HTML → 1080×1440 PNG 图集（Playwright），长图拼接模式</li>
+      <li><strong>M8</strong> 凭证管理：AppSecret/Token 加密存储、自动刷新、有效期告警、能力矩阵展示</li>
+      <li><strong>M7</strong> 公众号草稿投递：素材上传（图片转 <code>mmbiz.qpic.cn</code>）→ <code>draft/add</code>；正式账号追加 <code>freepublish/submit</code> + 发布事件回调</li>
+      <li><strong>M9</strong> AI 内容标识开关、发布频率限流</li>
+      <li>🎯 <strong>里程碑 M2「可用」</strong>：主题 → 公众号草稿箱真实落地；主题 → 小红书素材包 ZIP 一键导出</li>
+    </ul>
+  </div>
+</div>
+
+<div class="phase">
+  <div class="phase-h"><span class="tag">PHASE 3</span><span class="t">提效 · 队列、本地代理与协作</span><span class="w">第 11–14 周</span><span class="badge b-p1">P1</span></div>
+  <div class="phase-b">
+    <ul>
+      <li><strong>M7</strong> 任务队列化：定时发布、幂等键防重复、失败重试与死信告警、发布状态看板</li>
+      <li><strong>M12</strong> 本地投递代理（浏览器扩展 / CLI）：以用户本机 Cookie 态投递草稿，解决个人号与资质壁垒</li>
+      <li><strong>M10</strong> 草稿多版本 + 版本对比回滚 + 审核流转</li>
+      <li><strong>M1</strong> 多用户与角色权限、操作审计日志</li>
+      <li>🎯 <strong>里程碑 M3「可运营」</strong>：多账号凭据复用 + 定时发布 + 多人协作</li>
+    </ul>
+  </div>
+</div>
+
+<div class="phase">
+  <div class="phase-h"><span class="tag">PHASE 4</span><span class="t">扩展与商业化</span><span class="w">第 15 周起</span><span class="badge b-p2">P2</span></div>
+  <div class="phase-b">
+    <ul>
+      <li><strong>M11</strong> 数据回收：公众号阅读数据拉取、发布链接回写、内容效果看板</li>
+      <li>模板市场：用户自定义模板、模板分享与买断</li>
+      <li>扩展平台适配器：知乎 / 头条 / 微博 / B站专栏 / 视频号（复用 Renderer 接口）</li>
+      <li>开放 API + Webhooks，接入 Agent / n8n 工作流（对标 Postiz 的定位）</li>
+      <li>小程序端、移动端轻量预览与审批</li>
+    </ul>
+  </div>
+</div>
+
+<h4>里程碑一览</h4>
+<div class="tbl-scroll">
+<table>
+<thead><tr><th>里程碑</th><th>时点</th><th>验收标准</th></tr></thead>
+<tbody>
+<tr><td class="nowrap"><strong>M0</strong> 冻结</td><td>第 2 周末</td><td>plan.md + ER 图 + 资质申请已提交</td></tr>
+<tr><td class="nowrap"><strong>M1</strong> 可看</td><td>第 6 周末</td><td>主题资产可完整录入，3 套版式可预览渲染</td></tr>
+<tr><td class="nowrap"><strong>M2</strong> 可用</td><td>第 10 周末</td><td>公众号草稿箱端到端打通；小红书素材包可导出</td></tr>
+<tr><td class="nowrap"><strong>M3</strong> 可运营</td><td>第 14 周末</td><td>多账号 + 定时 + 协作 + 本地代理</td></tr>
+<tr><td class="nowrap"><strong>v1.0</strong> 发布</td><td>第 15–16 周</td><td>真实账号连续运营 2 周无发布事故</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 id="s12">2.5 优先级排序（P0 / P1 / P2）</h3>
+
+<div class="grid2">
+  <div class="card tight">
+    <h4><span class="badge b-p0">P0</span> 不做就不能交付</h4>
+    <ul style="margin-bottom:0">
+      <li>M2 主题管理（含多图 + 说明）</li>
+      <li>M3 素材图库与 File ID 抽象</li>
+      <li>M5 版式模板引擎</li>
+      <li>M6 微信 HTML / 小红书图集双渲染器</li>
+      <li>M8 账号凭证管理</li>
+      <li>M7 公众号草稿投递通道</li>
+      <li>M9 合规与风控基础版</li>
+      <li>小红书素材包导出（替代自动发布）</li>
+    </ul>
+  </div>
+  <div class="card tight">
+    <h4><span class="badge b-p1">P1</span> 显著提升价值</h4>
+    <ul style="margin-bottom:0">
+      <li>M4 AI 内容生成与差异化改写</li>
+      <li>M12 本地投递代理</li>
+      <li>M7 定时发布 + 队列重试</li>
+      <li>M10 草稿多版本与审核流转</li>
+      <li>M1 多用户角色与审计</li>
+      <li>发布状态看板与失败告警</li>
+    </ul>
+  </div>
+  <div class="card tight">
+    <h4><span class="badge b-p2">P2</span> 锦上添花</h4>
+    <ul style="margin-bottom:0">
+      <li>M11 数据回收与效果看板</li>
+      <li>模板市场与自定义模板</li>
+      <li>更多平台适配器</li>
+      <li>开放 API / Webhooks / MCP</li>
+      <li>移动端审批</li>
+    </ul>
+  </div>
+  <div class="card tight">
+    <h4><span class="badge b-no">明确不做</span> 红线与陷阱</h4>
+    <ul style="margin-bottom:0">
+      <li>❌ 小红书全自动发布 / AI 托管运营</li>
+      <li>❌ 自动点赞、自动评论、自动私信</li>
+      <li>❌ 多账号同设备互赞互评</li>
+      <li>❌ 爬虫式抓取平台内容</li>
+      <li>❌ 个人号承诺「一键群发」</li>
+      <li>❌ 首期自建多租户 SaaS 后台</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============ 补充功能 ============ -->
+<h2 id="s13">三、建议补充的功能（你未提及但必要）</h2>
+
+<div class="tbl-scroll">
+<table>
+<thead><tr><th>功能</th><th>为什么必须补</th><th>优先级</th></tr></thead>
+<tbody>
+<tr>
+  <td><strong>AI 生成内容标识</strong></td>
+  <td>小红书强制要求：AI 生成/辅助的内容必须在发布时勾选标识，绘图占比 ≥70% 建议加 <code>#AI创作</code> 标签。未标注首次即限流 7 天、扣信用分。产品应默认开启并写入文案尾部</td>
+  <td><span class="badge b-p0">P0</span></td>
+</tr>
+<tr>
+  <td><strong>发布频率限流器</strong></td>
+  <td>小红书风控看「行为特征」而非工具：单账号日发布数、发布间隔、多账号雷同度都是判罚依据。产品内置节奏管控（如单账号单日 ≤6 条、间隔 ≥30 分钟）能实质降低封号率</td>
+  <td><span class="badge b-p0">P0</span></td>
+</tr>
+<tr>
+  <td><strong>敏感词 / 违禁词检测</strong></td>
+  <td>公众号与小红书都有内容审核，前置拦截比发布后失败成本低得多。需可更新的词库 + 命中位置高亮</td>
+  <td><span class="badge b-p0">P0</span></td>
+</tr>
+<tr>
+  <td><strong>平台规格校验器</strong></td>
+  <td>微信：标题 ≤64 字、摘要 ≤120 字、封面 900×500、正文 ≤10 万字、图片不得外链。小红书：标题 ≤20 字、图 3:4。这些不一致必须在生成时校验，而不是发布时报错</td>
+  <td><span class="badge b-p0">P0</span></td>
+</tr>
+<tr>
+  <td><strong>幂等与防重复发布</strong></td>
+  <td>公众号订阅号 1 次/天、服务号 4 次/月，误发不可撤回。发布任务必须带幂等键、二次确认、以及「发布前 60 秒可撤销」的缓冲窗口</td>
+  <td><span class="badge b-p0">P0</span></td>
+</tr>
+<tr>
+  <td><strong>真机预览</strong></td>
+  <td>公众号排版在手机端和电脑端差异极大（微信会清洗 class）。必须提供手机尺寸模拟 + 微信草稿预览链接。这是排版类产品的口碑生死线</td>
+  <td><span class="badge b-p1">P1</span></td>
+</tr>
+<tr>
+  <td><strong>凭证健康监控</strong></td>
+  <td>平台 Token 会在 60–90 天过期或改密码后立即失效，且不会通知你——只会静默发布失败。需要定时探活 + 到期前告警</td>
+  <td><span class="badge b-p1">P1</span></td>
+</tr>
+<tr>
+  <td><strong>素材版权与来源标注</strong></td>
+  <td>你的主题模型里有「来源」和「时期」字段，这天然是版权与事实追溯的抓手。建议强制填写来源，并保留原图与处理图两版</td>
+  <td><span class="badge b-p1">P1</span></td>
+</tr>
+<tr>
+  <td><strong>平台能力矩阵页</strong></td>
+  <td>把「个人号能做什么、不能做什么」直接展示给用户，避免把平台限制误判为产品缺陷</td>
+  <td><span class="badge b-p1">P1</span></td>
+</tr>
+<tr>
+  <td><strong>LLM 成本计量与降级</strong></td>
+  <td>按主题/用户计量 token 消耗；主模型失败时降级到备用模型。你已有 DeepSeek 集成经验，可直接复用</td>
+  <td><span class="badge b-p2">P2</span></td>
+</tr>
+<tr>
+  <td><strong>内容版本与回滚</strong></td>
+  <td>AI 生成结果需要「重新生成 / 局部改写 / 回到上一版」。没有版本管理，用户不敢用 AI 生成</td>
+  <td><span class="badge b-p2">P2</span></td>
+</tr>
+<tr>
+  <td><strong>导出与迁移</strong></td>
+  <td>主题资产应能导出为 Markdown / JSON / ZIP（含图片），避免数据被锁在产品里——这既是用户信任，也是你的护城河之外的安全垫</td>
+  <td><span class="badge b-p2">P2</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<!-- ============ 风险 ============ -->
+<h2 id="s14">四、风险登记册</h2>
+
+<div class="tbl-scroll">
+<table>
+<thead><tr><th>级别</th><th>风险</th><th>影响</th><th>应对策略</th></tr></thead>
+<tbody>
+<tr>
+  <td><span class="badge b-p0">P0</span></td>
+  <td><strong>个人号发布接口被回收</strong><br><span style="font-size:12px;color:var(--faint)">2025.07 起生效</span></td>
+  <td>公众号无法自动群发，「自动发布」核心卖点失效</td>
+  <td>产品定位改为「推送草稿箱 + 后台一键发布」；把 90% 自动化做扎实。若必须全自动，需认证企业主体账号（服务号/企业订阅号）</td>
+</tr>
+<tr>
+  <td><span class="badge b-p0">P0</span></td>
+  <td><strong>小红书严禁第三方自动发布与 AI 托管</strong></td>
+  <td>一旦实现自动发布功能，用户账号会被限流/禁言/永久封禁，且同设备同实名矩阵连带处罚</td>
+  <td><strong>坚决不做自动发布</strong>。只输出素材包（PNG 图集 + 文案 + 话题），由用户手动在官方创作服务平台发布。产品内明确告知风险边界</td>
+</tr>
+<tr>
+  <td><span class="badge b-p0">P0</span></td>
+  <td><strong>开放平台资质门槛与审核周期</strong></td>
+  <td>小红书需企业主体 + 应用审核 2–4 周；微信认证需企业资质。卡住整个发布链路</td>
+  <td>Day 1 提交申请；同期建设「素材包导出」形态作为无资质阶段的完整替代方案，保证产品始终可用</td>
+</tr>
+<tr>
+  <td><span class="badge b-p0">P0</span></td>
+  <td><strong>微信 HTML 兼容性陷阱</strong></td>
+  <td>外链图片不显示（必须转 <code>mmbiz.qpic.cn</code>）、class 被清洗、SVG 效果不稳定；排版在手机端错乱</td>
+  <td>渲染器强制内联样式；出图前统一走素材上传接口；SVG 交互提供静态图集兜底；所有模板必须过真机预览验收</td>
+</tr>
+<tr>
+  <td><span class="badge b-p1">P1</span></td>
+  <td><strong>凭证安全与合规</strong></td>
+  <td>AppSecret / Token / Cookie 泄露会导致账号被盗、资金损失、平台处罚</td>
+  <td>AES-256-GCM 加密 + 独立密钥管理，密钥不入库不入代码库；优先采用本地代理方案让 Cookie 不出用户机器；启用最小权限与操作审计</td>
+</tr>
+<tr>
+  <td><span class="badge b-p1">P1</span></td>
+  <td><strong>版式引擎工作量被低估</strong></td>
+  <td>多目标渲染是项目最大的技术复杂度来源，容易拖垮排期</td>
+  <td>Phase 1 先硬编码 3 套模板跑通端到端，验证后再抽象 DSL；模板与引擎解耦，模板可热更新</td>
+</tr>
+<tr>
+  <td><span class="badge b-p1">P1</span></td>
+  <td><strong>平台接口频繁变更</strong></td>
+  <td>逆向或前台接口随平台改版失效，「三天一崩」是同类工具通病</td>
+  <td>适配器模式隔离平台差异；接口变更监控 + 快速降级到导出模式；发布失败必须明确提示失败原因而非静默</td>
+</tr>
+<tr>
+  <td><span class="badge b-p1">P1</span></td>
+  <td><strong>AI 生成内容的事实错误与同质化</strong></td>
+  <td>幻觉导致的错误信息、模板化雷同内容都会触发平台降权；小红书已把「模板化批量同质笔记」列为违规</td>
+  <td>AI 结果必须人工确认后落库；保留「来源/时期」字段做事实锚点；生成多样性约束（禁止批量套用同一话术）</td>
+</tr>
+<tr>
+  <td><span class="badge b-p2">P2</span></td>
+  <td><strong>范围蔓延</strong></td>
+  <td>平台适配器、模板市场、数据看板都容易膨胀，导致 v1.0 难产</td>
+  <td>严格按 P0 冻结 v1.0 范围；扩展平台的能力在 Phase 4 之后；采用「Renderer 接口 + 适配器」设计，让扩展成本可预测</td>
+</tr>
+<tr>
+  <td><span class="badge b-p2">P2</span></td>
+  <td><strong>图片处理与存储成本</strong></td>
+  <td>长图与高分图集体积大，对象存储与带宽成本随用户增长</td>
+  <td>生成时限制分辨率与格式（WebP）、设置配额、清理历史中间产物</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<!-- ============ 下一步 ============ -->
+<h2 id="s15">五、下一步行动</h2>
+
+<div class="card">
+  <h4>需要你确认的 4 件事（决定架构走向）</h4>
+  <ol style="margin-bottom:0">
+    <li><strong>目标账号主体类型</strong> —— 个人订阅号 vs 认证企业号？这直接决定「发布」能做到哪一步。若是个人号，v1.0 的产品承诺需改为「草稿箱 + 素材包」。</li>
+    <li><strong>小红书是否接受「不自动发布」</strong> —— 我建议明确放弃自动发布，改为素材包导出。这是合规底线，不是技术取舍。</li>
+    <li><strong>是否引入本地投递代理</strong> —— 这是绕开资质门槛的现实路径，但会增加客户端形态（扩展/CLI），影响交付复杂度。</li>
+    <li><strong>是否复用 Headless CMS</strong> —— 用 Directus/Payload 快速搭出主题管理后台（省 2–3 周），还是自研（可控但慢）。</li>
+  </ol>
+</div>
+
+<div class="card">
+  <h4>建议立即执行的动作</h4>
+  <ul style="margin-bottom:0">
+    <li>提交微信公众平台与小红书开放平台的资质申请（外部依赖，越早越好）</li>
+    <li>把你已有的「马靖昊股票分析框架」式的思路用在这里：先沉淀一份 <code>plan.md</code> + 内容模型 ER 图，再动手</li>
+    <li>用一个真实主题（比如赛轮轮胎或宝丰能源的研究）做端到端 PoC：录入 → 生成 → 渲染 → 导出，验证版式引擎的表达力能覆盖真实场景</li>
+    <li>确认上述 4 个决策点后，我可以直接输出 Phase 0 的 <code>plan.md</code> 与数据模型 DDL（延续 VARCHAR(200) ID 约定）</li>
+  </ul>
+</div>
+
+<footer>
+  数据来源：微信开放社区与公众号官方接口文档、小红书开放平台文档、各产品官网及公开评测（调研时点 2026-09-17）。竞品定价以官网实时报价为准，本表为当时快照。<br>
+  结论中的合规判断基于公开平台规则，不构成法律意见；实际执行前请复核平台最新规则。
+</footer>
+
+</main>
+</div>
+</div>
+</body>
+</html>

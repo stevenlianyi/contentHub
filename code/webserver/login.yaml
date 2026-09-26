@@ -1,0 +1,43 @@
+- generic [ref=f7e5]:
+  - generic [ref=f7e6]:
+    - generic [ref=f7e7]: 内容中枢
+    - generic [ref=f7e15]:
+      - heading "内容生产与投递中台" [level=2] [ref=f7e16]
+      - list [ref=f7e17]:
+        - listitem [ref=f7e18]:
+          - generic [aria-hidden] [ref=f7e19]: 
+          - generic [ref=f7e20]: 主题与素材统一管理
+        - listitem [ref=f7e21]:
+          - generic [aria-hidden] [ref=f7e22]: 
+          - generic [ref=f7e23]: 版式渲染与合规校验
+        - listitem [ref=f7e24]:
+          - generic [aria-hidden] [ref=f7e25]: 
+          - generic [ref=f7e26]: 投递留痕与审计追溯
+    - paragraph [ref=f7e27]: 内部系统 · 请使用分配给你的账号登录
+  - generic [ref=f7e28]:
+    - heading "登录" [level=1] [ref=f7e29]
+    - paragraph [ref=f7e30]: 请输入账号与口令
+    - generic [ref=f7e31]:
+      - generic [ref=f7e32]:
+        - generic [ref=f7e33]: 账号
+        - textbox "账号" [ref=f7e34]:
+          - /placeholder: 登录账号
+      - generic [ref=f7e35]:
+        - generic [ref=f7e36]: 口令
+        - textbox "口令" [ref=f7e37]:
+          - /placeholder: 登录口令
+      - generic [ref=f7e38]:
+        - generic [ref=f7e39]: 开发态角色
+        - combobox "开发态角色" [ref=f7e40]:
+          - option "管理员" [selected]
+          - option "业务主管"
+          - option "运营"
+          - option "客户（只读）"
+          - option "访客"
+        - paragraph [ref=f7e41]:
+          - text: 仅 Mock 模式可见：账号填
+          - code [ref=f7e42]: expired
+          - text: 验证会话失效（B8）路径， 填
+          - code [ref=f7e43]: error
+          - text: 验证失败态不清空输入。
+      - button "登录" [ref=f7e44] [cursor=pointer]

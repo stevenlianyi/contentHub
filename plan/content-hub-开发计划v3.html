@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>内容管理与多平台发布平台 — 开发计划 v3</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#ffffff; --ink:#1c1e21; --ink2:#5f6368; --ink3:#8a8f98;
+    --line:#e6e8eb; --line2:#d5d8dd;
+    --purple:#534AB7; --purple-bg:#EEEDFE;
+    --teal:#0F6E56; --teal-bg:#E1F5EE;
+    --blue:#185FA5; --blue-bg:#E6F1FB;
+    --amber:#854F0B; --amber-bg:#FAEEDA;
+    --coral:#993C1D; --coral-bg:#FAECE7;
+    --red:#A32D2D; --red-bg:#FCEBEB;
+    --green:#3B6D11; --green-bg:#EAF3DE;
+    --gray:#5F5E5A; --gray-bg:#F1EFE8;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.7;font-size:15px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1120px;margin:0 auto;padding:48px 28px 96px}
+  header.hero{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:36px 40px;margin-bottom:24px}
+  .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--purple);font-weight:600}
+  h1{font-size:30px;line-height:1.3;margin:10px 0 8px;font-weight:700;letter-spacing:-.01em}
+  .sub{color:var(--ink2);font-size:15px;margin:0}
+  .meta{margin-top:18px;display:flex;flex-wrap:wrap;gap:10px}
+  .chip{font-size:12px;background:var(--gray-bg);color:var(--gray);
+    border:1px solid var(--line2);border-radius:999px;padding:4px 12px}
+  h2{font-size:21px;margin:44px 0 14px;font-weight:700;letter-spacing:-.01em;
+    padding-bottom:10px;border-bottom:2px solid var(--line)}
+  h2 .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;
+    background:var(--purple);color:#fff;border-radius:9px;font-size:15px;margin-right:12px;vertical-align:2px}
+  h3{font-size:17px;margin:28px 0 10px;font-weight:600}
+  h4{font-size:14.5px;margin:18px 0 8px;font-weight:600;color:var(--ink2)}
+  p{margin:10px 0}
+  ul,ol{margin:10px 0;padding-left:22px}
+  li{margin:5px 0}
+  code{background:var(--gray-bg);border:1px solid var(--line);border-radius:5px;
+    padding:1px 6px;font-size:13px;font-family:"SF Mono",Consolas,monospace;color:var(--coral)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 26px;margin:16px 0}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px;
+    background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  th{background:#fafbfc;text-align:left;padding:11px 14px;font-weight:600;
+    border-bottom:1px solid var(--line);color:var(--ink);white-space:nowrap}
+  td{padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:#fbfcfd}
+  .pill{display:inline-block;font-size:11.5px;font-weight:600;border-radius:6px;padding:2px 8px;white-space:nowrap}
+  .p0{background:var(--red-bg);color:var(--red)}
+  .p1{background:var(--amber-bg);color:var(--amber)}
+  .p2{background:var(--gray-bg);color:var(--gray)}
+  .tag{display:inline-block;font-size:11.5px;border-radius:6px;padding:2px 8px;margin:2px 4px 2px 0;
+    background:var(--blue-bg);color:var(--blue)}
+  .tag.g{background:var(--teal-bg);color:var(--teal)}
+  .tag.o{background:var(--coral-bg);color:var(--coral)}
+  .tag.p{background:var(--purple-bg);color:var(--purple)}
+  .tag.keep{background:var(--green-bg);color:var(--green)}
+  .tag.cut{background:var(--red-bg);color:var(--red)}
+  pre{background:#fafbfc;border:1px solid var(--line);border-radius:12px;padding:16px 20px;
+    overflow-x:auto;font-size:12.5px;line-height:1.65;margin:12px 0;
+    font-family:"SF Mono",Consolas,"Courier New",monospace;color:#24292f}
+  pre.plain{background:#fff;border-left:4px solid var(--purple)}
+  pre.ddl{background:#fdfdfe;border-left:4px solid var(--teal);font-size:12.5px}
+  .callout{border-left:4px solid var(--purple);background:var(--purple-bg);
+    border-radius:0 12px 12px 0;padding:16px 20px;margin:18px 0}
+  .callout.warn{border-left-color:var(--red);background:var(--red-bg)}
+  .callout.ok{border-left-color:var(--teal);background:var(--teal-bg)}
+  .callout .t{font-weight:700;font-size:14px;margin:0 0 6px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:820px){.grid2,.grid3{grid-template-columns:1fr}}
+  .stat{background:#fafbfc;border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .stat .l{font-size:12px;color:var(--ink3);margin:0 0 6px}
+  .stat .v{font-size:23px;font-weight:700;margin:0;letter-spacing:-.02em}
+  .toc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 26px;margin-bottom:8px}
+  .toc ol{columns:2;column-gap:36px;margin:0}
+  @media(max-width:680px){.toc ol{columns:1}}
+  .toc a{color:var(--ink2);text-decoration:none}
+  .toc a:hover{color:var(--purple)}
+  a{color:var(--blue);text-decoration:none}
+  footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);
+    color:var(--ink3);font-size:12.5px;text-align:center}
+  details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin:12px 0}
+  summary{cursor:pointer;font-weight:600;font-size:14px;color:var(--ink)}
+  details[open] summary{margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div class="kicker">Development Plan · v3</div>
+  <h1>内容管理与多平台发布平台<br>开发计划 v3 — 对齐 ylwz 工程体系</h1>
+  <p class="sub">沿用「定义文件 → CRUD 生成器 → mysqlCommon」数据库链路，配置驱动 ALIOSS / TENCENT / SELFFILE 三种文件后端。</p>
+  <div class="meta">
+    <span class="chip">更新：2026-09-17</span>
+    <span class="chip">基线：ylwzProject/museum</span>
+    <span class="chip">MySQL 8.0 · InnoDB · utf8mb4</span>
+    <span class="chip">12 张 ch_* 表</span>
+    <span class="chip">8 个模块 / 4 个阶段</span>
+  </div>
+</header>
+
+<div class="toc">
+  <ol>
+    <li><a href="#s1">参考系统吸收与简化原则</a></li>
+    <li><a href="#s2">系统架构</a></li>
+    <li><a href="#s3">模块划分与依赖</a></li>
+    <li><a href="#s4">文件系统抽象设计</a></li>
+    <li><a href="#s5">数据库设计</a></li>
+    <li><a href="#s6">CRUD 生成方案</a></li>
+    <li><a href="#s7">目录结构</a></li>
+    <li><a href="#s8">阶段划分与里程碑</a></li>
+    <li><a href="#s9">风险登记册</a></li>
+    <li><a href="#s10">下一步</a></li>
+  </ol>
+</div>
+
+<div class="callout ok">
+  <p class="t">v3 一句话</p>
+  v2 是从零设计；v3 改成<strong>「站到 ylwz 既有肩膀上」</strong>——文件服务、账号服务、Redis 缓冲、mysqlHandle 全部复用，数据库走定义文件 + 生成器。净效果：<strong>模块从 14 个压到 8 个，阶段从 5 个压到 4 个，省掉 3~4 周自研工作量</strong>。
+</div>
+
+<h2 id="s1"><span class="num">1</span>参考系统吸收与简化原则</h2>
+
+<h3>1.1 参考系统评估：完备但过重</h3>
+<table>
+  <thead><tr><th style="width:18%">维度</th><th style="width:42%">museum 现状</th><th>对本项目的判断</th></tr></thead>
+  <tbody>
+    <tr><td>表数量</td><td>17 张（含 3 张归档表）</td><td><span class="tag cut">砍</span>压到 12 张</td></tr>
+    <tr><td>业务链路</td><td>9 阶段：采集→清洗→图片→翻译→审核→成稿→图片处理→发布→回流</td><td><span class="tag cut">压</span>本项目是<strong>人驱动编辑发布</strong>，不是爬取驱动，链路压到 6 步</td></tr>
+    <tr><td>REST 端点</td><td>110+（每表 add/del/modify/qry）</td><td><span class="tag keep">留</span>保留四组，按角色裁剪</td></tr>
+    <tr><td>采集适配器</td><td>7 个馆（met/aic/cleveland/…）</td><td><span class="tag cut">换</span>换成 3 个平台适配器</td></tr>
+    <tr><td><strong>文件服务</strong></td><td>自成体系：F0A0/F1A0/F2A0/F4A0/F6A0/F7A0/F8A0 七命令 + 三后端适配器</td><td><span class="tag keep">完整复用</span><strong>最有价值的部分</strong></td></tr>
+    <tr><td><strong>账号/权限</strong></td><td>独立 accountService（acis）</td><td><span class="tag keep">完整复用</span>不自研</td></tr>
+    <tr><td><strong>查询缓冲</strong></td><td>Redis + indexKey 分页机制</td><td><span class="tag keep">完整复用</span></td></tr>
+  </tbody>
+</table>
+
+<h3>1.2 三条吸收原则（P0）</h3>
+<div class="grid3">
+  <div class="card">
+    <h4>① 复用而非重造</h4>
+    <p>文件服务、账号服务、Redis 缓冲、<code>mysqlHandle</code> 连接池、<code>miscCommon</code> 工具集全部直接复用。只新增「业务表 + 业务处理器 + 渲染引擎 + 平台适配器」。</p>
+  </div>
+  <div class="card">
+    <h4>② 定义文件驱动</h4>
+    <p>数据库结构以 <code>ch_*.txt</code> 为唯一数据源。改表只改 txt → 重跑生成器 → 合入 <code>mysqlCommon.py</code>。<strong>业务代码里禁止裸 SQL 字符串</strong>。</p>
+  </div>
+  <div class="card">
+    <h4>③ 配置驱动多态</h4>
+    <p>文件后端、环境（<code>_SYS</code>）、凭据全部走配置文件。代码里<strong>不出现</strong>硬编码的云厂商分支。</p>
+  </div>
+</div>
+
+<h3>1.3 简化对照表</h3>
+<table>
+  <thead><tr><th style="width:4%">#</th><th style="width:38%">museum 的做法</th><th style="width:40%">本项目做法</th><th>动作</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td><code>FILE_SYSTEM_MODE</code> 支持 5 种（ALIOSS/TENCENT/SELFFILE/FASTDFS/NGINX）</td><td>保留 3 种（ALIOSS/TENCENT/SELFFILE）</td><td><span class="tag cut">砍</span>掉 FASTDFS/NGINX 历史包袱</td></tr>
+    <tr><td>2</td><td>每张表都有 add/del/modify/qry 四组 REST，权限扁平</td><td>保留四组，按 <code>ROLE_CMD_LIST</code> 裁剪</td><td><span class="tag">收</span>权限</td></tr>
+    <tr><td>3</td><td>采集 → 清洗 → 翻译 → 审核 → 成稿</td><td>主题 → 素材 → 渲染 → 校验 → 投递</td><td><span class="tag cut">压</span>链路</td></tr>
+    <tr><td>4</td><td>3 张归档表（crawl_run_log / translation_task / publish_record）</td><td>1 张 <code>ch_audit_log</code></td><td><span class="tag">并</span>归档</td></tr>
+    <tr><td>5</td><td>原始报文与清洗结果分离（<code>_raw</code> 表）</td><td>不设 <code>_raw</code> 表（数据即用户录入，无源站报文）</td><td><span class="tag cut">去</span></td></tr>
+    <tr><td>6</td><td>每个适配器一个 py + 单测</td><td>保留（3 个平台适配器）</td><td><span class="tag keep">留</span></td></tr>
+    <tr><td>7</td><td>表名 2 字母前缀（<code>mu_</code>）</td><td>表名 2 字母前缀（<code>ch_</code>）</td><td><span class="tag keep">沿</span>约定</td></tr>
+  </tbody>
+</table>
+
+<h2 id="s2"><span class="num">2</span>系统架构</h2>
+
+<h3>2.1 分层架构</h3>
+<pre class="plain">┌──────────────────────────────────────────────────────────────┐
+│ 接入层                                                        │
+│  Vue3 Web UI  │  RESTful (Flask /chapi)  │  MCP Server (SSE)  │
+└───────────────────────────┬──────────────────────────────────┘
+                            │  三者共用同一套应用服务门面
+┌───────────────────────────▼──────────────────────────────────┐
+│ 应用服务层（processor/）                                       │
+│  topicService │ assetService │ publishService │ mcpHub        │
+│  complianceService │ platformAdapter(微信/小红书/通用)          │
+└───────────────────────────┬──────────────────────────────────┘
+┌───────────────────────────▼──────────────────────────────────┐
+│ 引擎层（engine/）                                              │
+│  Jinja2 版式引擎 │ 微信内联样式器 │ 卡片截图器(Playwright)      │
+│  图片处理器(Pillow：缩放/压缩/EXIF剥离/图注水印)               │
+└───────────────────────────┬──────────────────────────────────┘
+┌───────────────────────────▼──────────────────────────────────┐
+│ 公共层（common/）—— 全部复用 ylwz 既有实现                     │
+│  mysqlCommon(生成器产物) │ mysqlHandle(连接池)                 │
+│  fileStorageCommon │ aliyunOSS │ tencentCOS │ selfFileCommon   │
+│  funcCommon │ miscCommon │ globalDefinition │ redisCommon      │
+└───────────────────────────┬──────────────────────────────────┘
+┌───────────────────────────▼──────────────────────────────────┐
+│ 存储层                                                        │
+│  MySQL 8.0 (ch_* 表)  │  ALIOSS / TENCENT / SELFFILE           │
+│  Redis (查询缓冲 / 任务锁)                                     │
+└──────────────────────────────────────────────────────────────┘</pre>
+
+<h3>2.2 与 ylwz 既有体系的关系</h3>
+<table>
+  <thead><tr><th style="width:20%">能力</th><th style="width:34%">归属</th><th>复用方式</th></tr></thead>
+  <tbody>
+    <tr><td>文件落盘/转存/取 URL</td><td>ylwz 文件服务（<code>ylwzRecvFiles.py</code> + 三适配器）</td><td><strong>HTTP 调用</strong>（<code>fileServerRequest</code>，CMD=F0A0/F7A0…）或 <strong>进程内直连</strong>适配器</td></tr>
+    <tr><td>用户登录/角色/权限</td><td>accountService（acis）</td><td>HTTP <code>POST {ACCOUNT_SERVICE_URL}</code>，CMD=GAA0 / A3A0</td></tr>
+    <tr><td>数据库读写</td><td><code>mysqlCommon.py</code></td><td>直接 import，只调 <code>insert_ch_* / query_ch_* / update_ch_* / delete_ch_*</code></td></tr>
+    <tr><td>时间/日志/JSON</td><td><code>miscCommon.py</code></td><td><code>misc.getTime()</code> / <code>misc.setLogNew()</code> / <code>misc.jsonLoads()</code></td></tr>
+    <tr><td>摘要/报文/文件请求</td><td><code>funcCommon.py</code></td><td><code>comFC.genDigest()</code> / <code>comFC.rtnMSG()</code> / <code>comFC.fileServerRequest()</code></td></tr>
+    <tr><td>分页查询缓冲</td><td><code>redisCommon.py</code></td><td><code>putQuery2Buffer</code> / <code>getQueryBufferComplte</code></td></tr>
+  </tbody>
+</table>
+
+<div class="callout ok">
+  <p class="t">复用收益</p>
+  这一层直接省掉「文件服务自研、账号体系自研、分页机制自研」三块工作，保守估计<strong>省 3–4 周</strong>。
+</div>
+
+<h3>2.3 业务链路（6 步，对比 museum 的 9 步）</h3>
+<pre class="plain">①建主题  →  ②配素材  →  ③选版式×平台  →  ④渲染  →  ⑤合规校验  →  ⑥投递</pre>
+<table>
+  <thead><tr><th style="width:6%">#</th><th style="width:22%">环节</th><th style="width:40%">落库表</th><th>主状态字段</th></tr></thead>
+  <tbody>
+    <tr><td>①</td><td>建/改主题</td><td><code>ch_topic</code>、<code>ch_topic_version</code></td><td><code>ch_topic.status = DRAFT</code></td></tr>
+    <tr><td>②</td><td>配素材</td><td><code>ch_asset</code>、<code>ch_topic_asset</code></td><td><code>ch_asset.processStatus</code></td></tr>
+    <tr><td>③</td><td>选版式</td><td><code>ch_layout</code>、<code>ch_platform</code></td><td>只读配置</td></tr>
+    <tr><td>④</td><td>渲染</td><td><code>ch_render_job</code>、<code>ch_artifact</code></td><td><code>ch_render_job.jobStatus</code></td></tr>
+    <tr><td>⑤</td><td>合规校验</td><td>不落库（写审计）</td><td>结果进 <code>ch_audit_log</code></td></tr>
+    <tr><td>⑥</td><td>投递</td><td><code>ch_publish_record</code>、<code>ch_account</code></td><td><code>ch_topic.publishStatus</code></td></tr>
+  </tbody>
+</table>
+
+<h2 id="s3"><span class="num">3</span>模块划分与依赖</h2>
+<p>从 v2 的 14 个模块收敛到 <strong>8 个</strong>。</p>
+<table>
+  <thead><tr><th style="width:6%">ID</th><th style="width:14%">模块</th><th style="width:32%">职责</th><th style="width:14%">依赖</th><th style="width:9%">优先级</th><th>落点</th></tr></thead>
+  <tbody>
+    <tr><td><strong>C1</strong></td><td>接入与权限</td><td>复用 accountService；角色裁剪；sessionID 校验</td><td>ylwz 账号服务</td><td><span class="pill p0">P0</span></td><td><code>main/</code>、<code>basicSettings.py</code></td></tr>
+    <tr><td><strong>C2</strong></td><td>主题管理</td><td>主题 CRUD；字段区间校验；状态机；版本快照</td><td>C1</td><td><span class="pill p0">P0</span></td><td><code>processor/topicService.py</code></td></tr>
+    <tr><td><strong>C3</strong></td><td>素材图库</td><td>上传（三后端切换）、内容哈希去重、规格裁剪、附图与说明绑定</td><td>C1、文件服务</td><td><span class="pill p0">P0</span></td><td><code>processor/assetService.py</code></td></tr>
+    <tr><td><strong>C4</strong></td><td>版式引擎</td><td>版式 DSL、内置 3 套模板、上下/轮播/长图渲染</td><td>C2、C3</td><td><span class="pill p0">P0</span></td><td><code>engine/layoutEngine.py</code></td></tr>
+    <tr><td><strong>C5</strong></td><td>平台适配</td><td><code>PlatformAdapter</code> 统一接口；微信内联化；小红书图集卡片</td><td>C4</td><td><span class="pill p0">P0</span></td><td><code>processor/platformAdapter/</code></td></tr>
+    <tr><td><strong>C6</strong></td><td>发布投递</td><td>公众号推草稿、素材包打包、幂等、发布记录</td><td>C5</td><td><span class="pill p0">P0</span></td><td><code>processor/publishService.py</code></td></tr>
+    <tr><td><strong>C7</strong></td><td>MCP 与开放接口</td><td>MCP Server（8 tool + 3 resource）；Token；审计</td><td>C2/C4/C6</td><td><span class="pill p0">P0</span></td><td><code>processor/mcpHub.py</code></td></tr>
+    <tr><td><strong>C8</strong></td><td>合规校验</td><td>AI 标识、频率限流、平台规格校验、二次确认</td><td>C2、C5</td><td><span class="pill p0">P0</span></td><td><code>processor/complianceService.py</code></td></tr>
+    <tr><td>C9</td><td>版本与协作</td><td>草稿多版本对比 / 回滚</td><td>C2</td><td><span class="pill p2">P2</span></td><td><code>processor/topicService.py</code></td></tr>
+    <tr><td>C10</td><td>数据回收</td><td>阅读 / 点赞数据回流</td><td>C6</td><td><span class="pill p2">P2</span></td><td><code>processor/statsService.py</code></td></tr>
+  </tbody>
+</table>
+
+<h3>关键依赖路径</h3>
+<pre class="plain">外部依赖（Day 1 启动，2~4 周）
+  企业号认证 ──► C1 凭据落库 ──► C6 公众号草稿投递
+
+主干（可并行，不依赖外部审核）
+  C1 ─► C2 ─► C3 ─► C4 ─► C5 ─► C6 ─► 产物
+                        └─► C7（MCP Hub，依赖 C4 渲染 + C6 投递）
+
+横切
+  C8 合规校验：C2 输入校验 + C5 产物校验，两条入口</pre>
+
+<div class="callout warn">
+  <p class="t">排期红线</p>
+  C7（MCP Hub）<strong>必须等 C4 / C6 稳定后</strong>再做，否则接口会随渲染引擎一起返工。安排在 Phase 3。
+</div>
+
+<h2 id="s4"><span class="num">4</span>文件系统抽象设计</h2>
+<p>本章是 v3 的核心。目标：<strong>同一套代码，改配置即可在 阿里云 OSS / 腾讯云 COS / 自建本地存储 之间切换</strong>。</p>
+
+<h3>4.1 设计目标</h3>
+<ol>
+  <li><strong>配置驱动</strong>：后端选择写在 <code>config/basicSettings.py</code> 的 <code>FILE_SYSTEM_MODE</code>，按 <code>_SYS</code> 环境映射。</li>
+  <li><strong>接口统一</strong>：所有后端实现同一组 6 个方法，业务层只调抽象方法名。</li>
+  <li><strong>业务无感</strong>：业务代码里<strong>不出现</strong> <code>if FILE_SYSTEM_MODE == "ALIOSS"</code> 这类分支。</li>
+  <li><strong>落库可追溯</strong>：<code>ch_asset.fileSystem</code> 快照记录落库时用的后端，支持中途切换后端后的历史文件读取。</li>
+</ol>
+
+<h3>4.2 配置层</h3>
+<h4>config/local_settings.py —— 环境选择入口</h4>
+<pre>_SYS = "server_01"          # local | server_01 | server_02 | test_server | home
+_SYS_SERVER_NAME = "chserver_01"</pre>
+
+<h4>config/basicSettings.py —— 全局开关</h4>
+<pre>#文件系统模式: ALIOSS(阿里云) | TENCENT(腾讯云COS) | SELFFILE(本地文件系统)
+FILE_SYSTEM_MODE = {
+    "local":       "SELFFILE",
+    "server_01":   "ALIOSS",
+    "server_02":   "TENCENT",
+    "test_server": "SELFFILE",
+    "home":        "SELFFILE",
+}[_SYS]
+
+#本地文件服务地址（SELFFILE / 临时文件访问用）
+LOCAL_FILE_SERVER_PATH = {...}[_SYS]   # http://host:9000/temp/
+LOCAL_FILE_SERVER_BASE = {...}[_SYS]   # /data/webserver/temp/
+LOCAL_FILE_TEMP_WEB_DIR = "web/"
+
+#图片规格（沿用 ylwz 约定）
+MAX_PIC_SIZE   = (1920, 1920)   # 正文图最大尺寸
+THUMBNAIL_SIZE = (640, 640)     # 缩略图尺寸
+ALLOW_FILE_TYPE_LIST = [".png", ".jpg", ".jpeg", ".webp", ".gif", ".mp4"]</pre>
+
+<h4>config/selfFileSettings.py —— 本地存储关键项</h4>
+<pre>SELF_FILE_SERVER_STORAGE_IF_REMOTE = False          # 是否远程存储（scp 同步）
+SELF_FILE_SERVER_STORAGE_ADDR      = "127.0.0.1"
+SELF_FILE_SERVER_STORAGE_DIR       = "/data/filestorage/"
+LOCAL_FILE_STORAGE_DIR_MAX_NUM     = 1000           # 随机分片目录数
+LOCAL_FILE_STORAGE_DIR_LEN         = 3              # 3 位零填充 000~999</pre>
+
+<h3>4.3 统一接口（所有后端必须实现）</h3>
+<table>
+  <thead><tr><th style="width:4%">#</th><th style="width:14%">方法</th><th style="width:34%">签名</th><th style="width:12%">返回</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td><code>uploadFile</code></td><td><code>(localPath, objectName, privateFlag=False)</code></td><td><code>fileID</code></td><td>落盘 / 上传，返回文件标识</td></tr>
+    <tr><td>2</td><td><code>downloadFile</code></td><td><code>(fileID, targetPath, privateFlag=False)</code></td><td><code>localPath</code></td><td>取回本地（失败返回 <code>""</code>）</td></tr>
+    <tr><td>3</td><td><code>existFile</code></td><td><code>(fileID, privateFlag=False)</code></td><td><code>bool</code></td><td>存在性检查</td></tr>
+    <tr><td>4</td><td><code>getFileInfo</code></td><td><code>(fileID, privateFlag=False)</code></td><td><code>dict</code></td><td>元信息（size / objectName / …）</td></tr>
+    <tr><td>5</td><td><code>deleteFile</code></td><td><code>(fileID, privateFlag=False)</code></td><td><code>bool</code></td><td>删除</td></tr>
+    <tr><td>6</td><td><code>genFileTempUrl</code></td><td><code>(fileID, targetFileName="", privateFlag=False, localAddress=False, sourceServerAddr="")</code></td><td><code>url</code></td><td><strong>fileID → 可访问 URL</strong></td></tr>
+  </tbody>
+</table>
+<div class="callout">
+  <p class="t">零改造</p>
+  这 6 个方法名与 ylwz 现有 <code>aliyunOSS.py</code> / <code>tencentCOS.py</code> / <code>selfFileCommon.py</code> <strong>完全一致</strong>，可直接沿用，无需改造适配器。
+</div>
+
+<h3>4.4 工厂门面 —— common/fileStorageCommon.py（新增）</h3>
+<pre>from config import basicSettings as settings
+from common import aliyunOSS  as OSS
+from common import tencentCOS as COS
+from common import selfFileCommon as SF
+
+def getStorage(mode=""):
+    """按 FILE_SYSTEM_MODE 返回对应适配器模块"""
+    mode = mode or settings.FILE_SYSTEM_MODE
+    return {"ALIOSS": OSS, "TENCENT": COS, "SELFFILE": SF}.get(mode, SF)
+
+# —— 业务层只调下面这组函数 ——
+def saveFile(localPath, objectName="", privateFlag=False, mode=""):
+    return getStorage(mode).uploadFile(localPath, objectName, privateFlag)
+
+def delFile(fileID, privateFlag=False, mode=""):
+    return getStorage(mode).deleteFile(fileID, privateFlag)
+
+def saveWithThumbnail(localPath, objectName="", privateFlag=False, mode=""):
+    """先出缩略图再存主图，返回 (fileID, thumbnailID)"""
+    storage   = getStorage(mode)
+    thumbPath = buildThumbnail(localPath)          # Pillow: thumbnail(THUMBNAIL_SIZE)
+    thumbID   = storage.uploadFile(thumbPath, objectName + "_thumb", privateFlag)
+    fileID    = storage.uploadFile(localPath, objectName, privateFlag)
+    return fileID, thumbID
+
+def getTempLocation(fileID, privateFlag=True, localAccess=False,
+                    localAddress=False, targetFileName="", sourceServerAddr=""):
+    """把 fileID 转成可访问 URL；fileID 已是 http 开头则原样返回"""
+    if not fileID or fileID[:4] == "http":
+        return fileID
+    return getStorage().genFileTempUrl(
+        fileID, targetFileName=targetFileName, privateFlag=privateFlag,
+        localAddress=localAddress, sourceServerAddr=sourceServerAddr)</pre>
+
+<h3>4.5 fileID 语义（按后端正交定义）</h3>
+<table>
+  <thead><tr><th style="width:14%">后端</th><th style="width:24%">fileID 形态</th><th style="width:32%">示例</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><td><strong>ALIOSS</strong></td><td>对象键 objectName</td><td><code>pic_20260917093001_a1b2c3.jpg</code></td><td>桶内唯一键</td></tr>
+    <tr><td><strong>TENCENT</strong></td><td>对象键 objectName</td><td><code>pic_20260917093001_a1b2c3.jpg</code></td><td>同上</td></tr>
+    <tr><td><strong>SELFFILE</strong></td><td><code>{3位分片}/{file+uuid}</code></td><td><code>037/file4f2a9c8e…</code></td><td>相对 STORAGE_DIR 的路径</td></tr>
+  </tbody>
+</table>
+<h4>SELFFILE 双文件机制（沿用 ylwz 设计）</h4>
+<pre>/data/filestorage/037/file4f2a9c8e…  .data   &lt;-- 二进制内容
+                                     .info   &lt;-- JSON 元信息</pre>
+<pre>{
+  "serverName": "chserver_01",   "fileSystem": "SELFFILE",
+  "description": "pic",          "fileName": "/data/webserver/temp/2/0000000322",
+  "oldFileName": "cover.jpg",    "objectName": "cover.jpg",
+  "fileExtName": ".jpg",         "fileSize": 299208,
+  "fileUrl": "037/file4f2a9c8e…","uploadYMDHMS": "20260917093001",
+  "prefix": "",                  "compressFlag": "N"
+}</pre>
+
+<h3>4.6 两种接入模式</h3>
+<table>
+  <thead><tr><th style="width:16%">模式</th><th style="width:16%">适用</th><th style="width:30%">做法</th><th style="width:19%">优点</th><th>缺点</th></tr></thead>
+  <tbody>
+    <tr><td><strong>A. HTTP 文件服务</strong><br><span class="tag p">默认</span></td><td>Web 应用同步请求</td><td><code>comFC.fileServerRequest(serverName, {CMD:"F7A0", fileID, token})</code></td><td>应用不持有 AK；Token 鉴权；权限收敛</td><td>多一跳网络</td></tr>
+    <tr><td><strong>B. 进程内直连</strong></td><td>批处理 / 渲染 worker</td><td>直接 import <code>fileStorageCommon</code> 调适配器</td><td>低延迟、适合批量</td><td>每个进程需配 AK</td></tr>
+  </tbody>
+</table>
+<p><strong>推荐组合</strong>：Web 请求走 A；渲染/打包 worker 走 B。两者最终落到<strong>同一份配置</strong>，fileID 语义一致，可互认。</p>
+
+<h3>4.7 文件服务命令（复用 ylwz 协议）</h3>
+<table>
+  <thead><tr><th style="width:10%">CMD</th><th style="width:38%">作用</th><th>本项目用法</th></tr></thead>
+  <tbody>
+    <tr><td><code>F0A0</code></td><td>临时 → 永久存储（可带缩略图 / 压缩）</td><td>素材转存</td></tr>
+    <tr><td><code>F1A0</code></td><td>删除临时文件</td><td>上传后清理</td></tr>
+    <tr><td><code>F2A0</code></td><td>删除长期文件</td><td>产物过期清理</td></tr>
+    <tr><td><code>F4A0</code></td><td>合并多图为一张长图</td><td><strong>小红书长图拼接（直接复用！）</strong></td></tr>
+    <tr><td><code>F6A0</code></td><td>获取文件信息</td><td>校验 / 展示</td></tr>
+    <tr><td><code>F7A0</code></td><td>永久 → 本地临时目录并生成 URL</td><td>渲染取图、预览</td></tr>
+    <tr><td><code>F8A0</code></td><td>获取永久文件信息</td><td>产物核对</td></tr>
+    <tr><td><code>/hfile</code></td><td>multipart 直传</td><td>前端上传入口</td></tr>
+  </tbody>
+</table>
+<div class="callout ok">
+  <p class="t">意外收获</p>
+  <code>F4A0</code> 的多图合并（<code>multiImageMerge</code>）正好是「长图拼接」版式需要的能力，<strong>可直接复用，无需自研</strong>。
+</div>
+
+<h3>4.8 fileID → URL 的转换责任</h3>
+<div class="callout">
+  <p class="t">约定（P0）</p>
+  数据库只存 <code>fileID</code>（<code>VARCHAR(200)</code>），<strong>URL 由后端在出参时转换</strong>。前端永远拿不到、也不需要知道 <code>fileID</code>。
+</div>
+<pre>def fillFileUrls(aSet, fileFields=["coverFileID", "thumbnailID", "fileID"]):
+    for f in fileFields:
+        fid = aSet.get(f, "")
+        if fid:
+            aSet[f.replace("FileID", "Url")] = getTempLocation(fid, privateFlag=True)
+    return aSet</pre>
+
+<h2 id="s5"><span class="num">5</span>数据库设计</h2>
+
+<h3>5.1 设计原则</h3>
+<table>
+  <thead><tr><th style="width:28%">原则</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><td><strong>MySQL 8.0 / InnoDB / utf8mb4</strong></td><td>引擎与字符集固定，排序规则 <code>utf8mb4_unicode_ci</code></td></tr>
+    <tr><td><strong>定义文件是唯一数据源</strong></td><td>12 张表各一个 <code>code/src/database/ch_*.txt</code>。改结构只改 txt → 重跑生成器</td></tr>
+    <tr><td><strong>读写全走生成代码</strong></td><td>业务层只调 <code>comMysql.insert_ch_*()</code> 等，<strong>禁止裸 SQL</strong></td></tr>
+    <tr><td><strong>统一 recID 自增主键</strong></td><td>首字段一律 <code>recID BIGINT AUTO_INCREMENT PRIMARY KEY</code>；业务唯一性由唯一索引承担</td></tr>
+    <tr><td><strong>拼接唯一键即幂等</strong></td><td>生成器不支持复合唯一键 → 应用层拼接单列 + 内联 <code>UNIQUE</code></td></tr>
+    <tr><td><strong>无外键</strong></td><td>全部移除 <code>FOREIGN KEY</code>，改应用层完整性 + 索引</td></tr>
+    <tr><td><strong>时间列 VARCHAR(16)</strong></td><td>存 <code>YYYYMMDDHHMMSS</code>，不用 <code>DATETIME</code>（避免时区歧义，可直接字符串比较）</td></tr>
+    <tr><td><strong>固定尾部七字段</strong></td><td><code>label / memo / regID / regYMDHMS / modifyID / modifyYMDHMS / delFlag</code>，顺序不可变</td></tr>
+    <tr><td><strong>文件字段统一</strong></td><td>文件引用 <code>fileID VARCHAR(200)</code>；缩略图 <code>thumbnailID VARCHAR(200)</code>；去重 <code>contentHash CHAR(64) UNIQUE</code></td></tr>
+  </tbody>
+</table>
+
+<h4>命名规范</h4>
+<ul>
+  <li><strong>定义文件</strong>：<code>ch_</code> 前缀 + 小写下划线单数，如 <code>ch_topic.txt</code></li>
+  <li><strong>表名</strong>：与文件名同名，全小写</li>
+  <li><strong>业务标识列</strong>：驼峰，如 <code>topicCode</code>、<code>assetKey</code>、<code>idempotencyKey</code></li>
+  <li><strong>布尔 / 标记</strong>：<code>CHAR(1)</code>（<code>'0'</code>/<code>'1'</code>）</li>
+  <li><strong>状态</strong>：<code>VARCHAR(24)</code> + <code>COMMENT</code> 枚举（不用 <code>ENUM</code>）</li>
+  <li><strong>小整数</strong>：<code>SMALLINT</code> / <code>TINYINT</code></li>
+</ul>
+
+<h3>5.2 表清单总览（12 张）</h3>
+<table>
+  <thead><tr><th style="width:4%">#</th><th style="width:17%">定义文件</th><th style="width:14%">表名</th><th style="width:20%">用途</th><th style="width:24%">幂等唯一键（拼接列）</th><th style="width:8%">归档</th><th>量级</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td><code>ch_topic.txt</code></td><td><code>ch_topic</code></td><td><strong>主题主表</strong></td><td><code>topicCode</code>（UNIQUE）</td><td>否</td><td>十万级</td></tr>
+    <tr><td>2</td><td><code>ch_topic_asset.txt</code></td><td><code>ch_topic_asset</code></td><td>主题-附图关联（含说明）</td><td><code>assetKey</code> = <code>topicID:fileID</code></td><td>否</td><td>百万级</td></tr>
+    <tr><td>3</td><td><code>ch_asset.txt</code></td><td><code>ch_asset</code></td><td><strong>素材资源</strong></td><td><code>fileID</code>、<code>contentHash</code>（各 UNIQUE）</td><td>否</td><td>百万级</td></tr>
+    <tr><td>4</td><td><code>ch_layout.txt</code></td><td><code>ch_layout</code></td><td>版式模板定义</td><td><code>layoutCode</code>（UNIQUE）</td><td>否</td><td>百级</td></tr>
+    <tr><td>5</td><td><code>ch_platform.txt</code></td><td><code>ch_platform</code></td><td><strong>平台能力矩阵</strong></td><td><code>platformCode</code>（UNIQUE）</td><td>否</td><td>十级</td></tr>
+    <tr><td>6</td><td><code>ch_render_job.txt</code></td><td><code>ch_render_job</code></td><td>渲染任务</td><td><code>jobCode</code>（UNIQUE）</td><td>否</td><td>十万级</td></tr>
+    <tr><td>7</td><td><code>ch_artifact.txt</code></td><td><code>ch_artifact</code></td><td><strong>渲染产物</strong></td><td><code>artifactKey</code> = <code>jobID:kind:platform:seqNo</code></td><td>否</td><td>百万级</td></tr>
+    <tr><td>8</td><td><code>ch_account.txt</code></td><td><code>ch_account</code></td><td><strong>平台账号（含加密凭据）</strong></td><td><code>accountCode</code>（UNIQUE）</td><td>否</td><td>百级</td></tr>
+    <tr><td>9</td><td><code>ch_publish_record.txt</code></td><td><code>ch_publish_record</code></td><td>发布记录</td><td><code>idempotencyKey</code>（UNIQUE）</td><td>否</td><td>十万级</td></tr>
+    <tr><td>10</td><td><code>ch_mcp_token.txt</code></td><td><code>ch_mcp_token</code></td><td>MCP 访问令牌</td><td><code>tokenHash</code>（UNIQUE）</td><td>否</td><td>百级</td></tr>
+    <tr><td>11</td><td><code>ch_audit_log.txt</code></td><td><code>ch_audit_log</code></td><td><strong>审计日志</strong></td><td>—（追加写）</td><td><strong>是</strong></td><td>千万级</td></tr>
+    <tr><td>12</td><td><code>ch_topic_version.txt</code></td><td><code>ch_topic_version</code></td><td>主题版本快照（P2）</td><td><code>verKey</code> = <code>topicID:versionNo</code></td><td>否</td><td>十万级</td></tr>
+  </tbody>
+</table>
+
+<h3>5.3 表定义文件全文</h3>
+<p>格式：每行一个字段，<code>字段名 类型 [约束] COMMENT '说明'</code>，<strong>字段行内用单空格分隔</strong>。存放于 <code>code/src/database/</code>。</p>
+
+<h4>（1）ch_topic.txt —— 主题主表</h4>
+<pre class="ddl">recID BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '记录ID'
+topicCode VARCHAR(64) NOT NULL UNIQUE COMMENT '主题编码 幂等键'
+title VARCHAR(128) NOT NULL COMMENT '标题 限50字'
+summary VARCHAR(400) NULL COMMENT '简介 限200字'
+description MEDIUMTEXT NULL COMMENT '详细描述正文 2000到5000字'
+descriptionFileID VARCHAR(200) NULL COMMENT '详述大稿fileID 超长时正文转存文件'
+coverFileID VARCHAR(200) NULL COMMENT '标题图fileID'
+coverThumbID VARCHAR(200) NULL COMMENT '标题图缩略图fileID'
+author VARCHAR(64) NULL COMMENT '作者'
+location VARCHAR(128) NULL COMMENT '地点'
+source VARCHAR(255) NULL COMMENT '来源'
+period VARCHAR(64) NULL COMMENT '时期'
+tagList VARCHAR(512) NULL COMMENT '标签 逗号分隔'
+categoryCode VARCHAR(32) NULL COMMENT '分类编码'
+status VARCHAR(24) NOT NULL DEFAULT 'DRAFT' COMMENT 'DRAFT或RENDERING或RENDERED或PUBLISHED或ARCHIVED'
+publishStatus VARCHAR(24) NOT NULL DEFAULT 'UNPUBLISHED' COMMENT 'UNPUBLISHED或DRAFTED或PUBLISHED或FAILED'
+assetCount SMALLINT NOT NULL DEFAULT 0 COMMENT '附图数量'
+wordCount INT NOT NULL DEFAULT 0 COMMENT '详述字数'
+aiFlag CHAR(1) NOT NULL DEFAULT '0' COMMENT '是否AI参与创作'
+ownerID VARCHAR(64) NULL COMMENT '归属用户loginID'
+label VARCHAR(32) COMMENT 'label'
+memo VARCHAR(200) COMMENT 'memo'
+regID VARCHAR(32) COMMENT '注册ID'
+regYMDHMS VARCHAR(16) COMMENT '注册年月日'
+modifyID VARCHAR(32) COMMENT '修改用户ID'
+modifyYMDHMS VARCHAR(16) COMMENT '修改年月日'
+delFlag CHAR(1) COMMENT '删除标记'</pre>
+
+<h4>（2）ch_topic_asset.txt —— 主题-附图关联</h4>
+<pre class="ddl">recID BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '记录ID'
+assetKey VARCHAR(400) NOT NULL UNIQUE COMMENT '幂等键 topicID加冒号加fileID'
+topicID BIGINT NOT NULL COMMENT '关联ch_topic.recID'
+fileID VARCHAR(200) NOT NULL COMMENT '素材fileID 关联ch_asset.fileID'
+caption VARCHAR(512) NULL COMMENT '图片简要说明'
+usageType VARCHAR(24) NOT NULL DEFAULT 'body' COMMENT 'cover或body或inline'
+sortOrder SMALLINT NOT NULL DEFAULT 100 COMMENT '展示顺序 越小越靠前'
+label VARCHAR(32) COMMENT 'label'
+memo VARCHAR(200) COMMENT 'memo'
+regID VARCHAR(32) COMMENT '注册ID'
+regYMDHMS VARCHAR(16) COMMENT '注册年月日'
+modifyID VARCHAR(32) COMMENT '修改用户ID'
+modifyYMDHMS VARCHAR(16) COMMENT '修改年月日'
+delFlag CHAR(1) COMMENT '删除标记'</pre>
+
+<h4>（3）ch_asset.txt —— 素材资源</h4>
+<pre class="ddl">recID BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '记录ID'
+fileID VARCHAR(200) NOT NULL UNIQUE COMMENT '文件服务器fileID 只存标识'
+thumbnailID VARCHAR(200) NULL COMMENT '缩略图fileID'
+contentHash CHAR(64) NOT NULL UNIQUE COMMENT 'sha256原始字节 内容级去重'
+fileSystem VARCHAR(16) NOT NULL COMMENT '落库时后端快照 ALIOSS或TENCENT或SELFFILE'
+storageBucket VARCHAR(64) NULL COMMENT '存储桶名 本地存储为local'
+storagePath VARCHAR(512) NULL COMMENT '本地相对路径 SELFFILE用'
+objectName VARCHAR(255) NULL COMMENT '对象键 ALIOSS/TENCENT用'
+origName VARCHAR(255) NULL COMMENT '原始文件名'
+mimeType VARCHAR(64) NULL COMMENT 'MIME类型'
+fileExt VARCHAR(16) NULL COMMENT '扩展名'
+origSizeBytes BIGINT NOT NULL DEFAULT 0 COMMENT '原始字节数'
+width INT NULL COMMENT '原始宽度'
+height INT NULL COMMENT '原始高度'
+derivedFileID VARCHAR(200) NULL COMMENT '规格处理后fileID'
+derivedThumbID VARCHAR(200) NULL COMMENT '处理后缩略图fileID'
+derivedWidth INT NULL COMMENT '处理后宽度'
+derivedHeight INT NULL COMMENT '处理后高度'
+derivedSizeBytes BIGINT NULL COMMENT '处理后字节数'
+exifStripped CHAR(1) NOT NULL DEFAULT '0' COMMENT '是否已剥离EXIF'
+processStatus VARCHAR(24) NOT NULL DEFAULT 'RAW' COMMENT 'RAW或PROCESSED或FAILED'
+errMsg VARCHAR(512) NULL COMMENT '错误信息'
+ownerID VARCHAR(64) NULL COMMENT '上传者loginID'
+label VARCHAR(32) COMMENT 'label'
+memo VARCHAR(200) COMMENT 'memo'
+regID VARCHAR(32) COMMENT '注册ID'
+regYMDHMS VARCHAR(16) COMMENT '注册年月日'
+modifyID VARCHAR(32) COMMENT '修改用户ID'
+modifyYMDHMS VARCHAR(16) COMMENT '修改年月日'
+delFlag CHAR(1) COMMENT '删除标记'</pre>
+
+<h4>（4）ch_layout.txt —— 版式模板定义</h4>
+<pre class="ddl">recID BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '记录ID'
+layoutCode VARCHAR(64) NOT NULL UNIQUE COMMENT '版式唯一编码 如stack_v1'
+layoutName VARCHAR(64) NOT NULL COMMENT '版式名称'
+layoutType VARCHAR(24) NOT NULL COMMENT 'stack上下 或 carousel左右轮播 或 longimage长图'
+platform VARCHAR(24) NOT NULL COMMENT 'wechat_mp或xiaohongshu或generic'
+engine VARCHAR(24) NOT NULL DEFAULT 'jinja2' COMMENT '渲染引擎'
+templatePath VARCHAR(255) NULL COMMENT '模板文件相对路径'
+templateVer VARCHAR(24) NOT NULL DEFAULT 'v1' COMMENT '模板版本'
+outputKind VARCHAR(24) NOT NULL DEFAULT 'html' COMMENT 'html或png或zip'
+specJson VARCHAR(1000) NULL COMMENT '版式参数JSON 尺寸或间距或配色'
+previewFileID VARCHAR(200) NULL COMMENT '版式预览图fileID'
+builtinFlag CHAR(1) NOT NULL DEFAULT '1' COMMENT '是否内置'
+enabled CHAR(1) NOT NULL DEFAULT '1' COMMENT '是否启用'
+sortWeight SMALLINT NOT NULL DEFAULT 100 COMMENT '排序权重 越小越靠前'
+label VARCHAR(32) COMMENT 'label'
+memo VARCHAR(200) COMMENT 'memo'
+regID VARCHAR(32) COMMENT '注册ID'
+regYMDHMS VARCHAR(16) COMMENT '注册年月日'
+modifyID VARCHAR(32) COMMENT '修改用户ID'
+modifyYMDHMS VARCHAR(16) COMMENT '修改年月日'
+delFlag CHAR(1) COMMENT '删除标记'</pre>
+
+<h4>（5）ch_platform.txt —— 平台能力矩阵</h4>
+<pre class="ddl">recID BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '记录ID'
+platformCode VARCHAR(32) NOT NULL UNIQUE COMMENT 'wechat_mp或xiaohongshu或generic'
+platformName VARCHAR(64) NOT NULL COMMENT '平台名称'
+subjectScope VARCHAR(128) NULL COMMENT '支持的主体类型 如个人订阅号或认证服务号'
+deliverMode VARCHAR(24) NOT NULL COMMENT 'draft_box或asset_pack或api_publish'
+titleMaxLen SMALLINT NOT NULL DEFAULT 64 COMMENT '标题字数上限'
+summaryMaxLen SMALLINT NOT NULL DEFAULT 200 COMMENT '简介字数上限'
+coverSpec VARCHAR(64) NULL COMMENT '封面规格 如900x500'
+imageSpec VARCHAR(64) NULL COMMENT '正文图规格 如1080x1440'
+imageMaxCount SMALLINT NOT NULL DEFAULT 20 COMMENT '图片数量上限'
+allowSvgFlag CHAR(1) NOT NULL DEFAULT '0' COMMENT '是否允许SVG交互'
+needAiLabelFlag CHAR(1) NOT NULL DEFAULT '0' COMMENT '是否强制AI内容标识'
+autoPublishFlag CHAR(1) NOT NULL DEFAULT '0' COMMENT '是否允许自动发布'
+limitNote VARCHAR(512) NULL COMMENT '限制与风控说明'
+docUrl VARCHAR(512) NULL COMMENT '官方文档地址'
+enabled CHAR(1) NOT NULL DEFAULT '1' COMMENT '是否启用'
+label VARCHAR(32) COMMENT 'label'
+memo VARCHAR(200) COMMENT 'memo'
+regID VARCHAR(32) COMMENT '注册ID'
+regYMDHMS VARCHAR(16) COMMENT '注册年月日'
+modifyID VARCHAR(32) COMMENT '修改用户ID'
+modifyYMDHMS VARCHAR(16) COMMENT '修改年月日'
+delFlag CHAR(1) COMMENT '删除标记'</pre>
+
+<h4>（6）ch_render_job.txt —— 渲染任务</h4>
+<pre class="ddl">recID BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '记录ID'
+jobCode VARCHAR(64) NOT NULL UNIQUE COMMENT '任务编码 幂等键'
+topicID BIGINT NOT NULL COMMENT '关联ch_topic.recID'
+layoutCode VARCHAR(64) NOT NULL COMMENT '版式编码'
+platform VARCHAR(24) NOT NULL COMMENT '目标平台'
+jobStatus VARCHAR(24) NOT NULL DEFAULT 'PENDING' COMMENT 'PENDING或RUNNING或DONE或FAILED'
+inputHash CHAR(64) NULL COMMENT '输入快照sha256 内容未变可复用产物'
+progress TINYINT NOT NULL DEFAULT 0 COMMENT '进度百分比'
+errMsg VARCHAR(512) NULL COMMENT '错误信息'
+startYMDHMS VARCHAR(16) NULL COMMENT '开始时间'
+finishYMDHMS VARCHAR(16) NULL COMMENT '完成时间'
+costMs INT NULL COMMENT '耗时毫秒'
+ownerID VARCHAR(64) NULL COMMENT '发起者loginID'
+label VARCHAR(32) COMMENT 'label'
+memo VARCHAR(200) COMMENT 'memo'
+regID VARCHAR(32) COMMENT '注册ID'
+regYMDHMS VARCHAR(16) COMMENT '注册年月日'
+modifyID VARCHAR(32) COMMENT '修改用户ID'
+modifyYMDHMS VARCHAR(16) COMMENT '修改年月日'
+delFlag CHAR(1) COMMENT '删除标记'</pre>
+
+<h4>（7）ch_artifact.txt —— 渲染产物</h4>
+<pre class="ddl">recID BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '记录ID'
+artifactKey VARCHAR(400) NOT NULL UNIQUE COMMENT '幂等键 jobID加冒号加kind加冒号加platform加冒号加seqNo'
+jobID BIGINT NOT NULL COMMENT '关联ch_render_job.recID'
+topicID BIGINT NOT NULL COMMENT '冗余主题ID 便于按主题查产物'
+kind VARCHAR(24) NOT NULL COMMENT 'html或png或zip或json'
+platform VARCHAR(24) NOT NULL COMMENT '目标平台'
+fileID VARCHAR(200) NOT NULL COMMENT '产物文件fileID'
+thumbnailID VARCHAR(200) NULL COMMENT '产物缩略图fileID'
+seqNo SMALLINT NOT NULL DEFAULT 1 COMMENT '序号 图集多张时递增'
+artifactVer INT NOT NULL DEFAULT 1 COMMENT '产物版本'
+specNote VARCHAR(128) NULL COMMENT '规格说明 如1080x1440'
+sizeBytes BIGINT NULL COMMENT '字节数'
+artifactStatus VARCHAR(24) NOT NULL DEFAULT 'READY' COMMENT 'READY或EXPIRED'
+expireYMDHMS VARCHAR(16) NULL COMMENT '保留到期时间'
+label VARCHAR(32) COMMENT 'label'
+memo VARCHAR(200) COMMENT 'memo'
+regID VARCHAR(32) COMMENT '注册ID'
+regYMDHMS VARCHAR(16) COMMENT '注册年月日'
+modifyID VARCHAR(32) COMMENT '修改用户ID'
+modifyYMDHMS VARCHAR(16) COMMENT '修改年月日'
+delFlag CHAR(1) COMMENT '删除标记'</pre>
+
+<h4>（8）ch_account.txt —— 平台账号（含加密凭据）</h4>
+<pre class="ddl">recID BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '记录ID'
+accountCode VARCHAR(64) NOT NULL UNIQUE COMMENT '账号幂等键'
+platform VARCHAR(24) NOT NULL COMMENT '所属平台'
+accountName VARCHAR(128) NOT NULL COMMENT '账号名称'
+subjectType VARCHAR(24) NOT NULL COMMENT 'personal或enterprise'
+verifiedFlag CHAR(1) NOT NULL DEFAULT '0' COMMENT '是否已认证'
+capability VARCHAR(64) NOT NULL COMMENT 'draft_box或asset_pack或api_publish'
+appID VARCHAR(64) NULL COMMENT '平台appID 微信为appid'
+credentialCipher TEXT NULL COMMENT '凭据密文 AES加密 明文永不落库'
+credentialIV VARCHAR(64) NULL COMMENT '加密初始向量'
+expireYMDHMS VARCHAR(16) NULL COMMENT '凭据到期时间'
+healthStatus VARCHAR(24) NOT NULL DEFAULT 'UNKNOWN' COMMENT 'OK或EXPIRING或INVALID或UNKNOWN'
+lastCheckYMDHMS VARCHAR(16) NULL COMMENT '最近健康检查时间'
+lastUseYMDHMS VARCHAR(16) NULL COMMENT '最近调用时间'
+ownerID VARCHAR(64) NULL COMMENT '归属loginID'
+label VARCHAR(32) COMMENT 'label'
+memo VARCHAR(200) COMMENT 'memo'
+regID VARCHAR(32) COMMENT '注册ID'
+regYMDHMS VARCHAR(16) COMMENT '注册年月日'
+modifyID VARCHAR(32) COMMENT '修改用户ID'
+modifyYMDHMS VARCHAR(16) COMMENT '修改年月日'
+delFlag CHAR(1) COMMENT '删除标记'</pre>
+
+<h4>（9）ch_publish_record.txt —— 发布/投递记录</h4>
+<pre class="ddl">recID BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '记录ID'
+idempotencyKey VARCHAR(400) NOT NULL UNIQUE COMMENT '幂等键 由调用方传入 防重复提交'
+artifactId BIGINT NOT NULL COMMENT '关联ch_artifact.recID'
+topicID BIGINT NOT NULL COMMENT '冗余主题ID'
+accountID BIGINT NULL COMMENT '关联ch_account.recID 素材包导出可空'
+platform VARCHAR(24) NOT NULL COMMENT '目标平台'
+deliverMode VARCHAR(24) NOT NULL COMMENT 'draft_box或asset_pack'
+requestJson JSON NULL COMMENT '请求报文摘要'
+responseJson JSON NULL COMMENT '响应报文摘要'
+errcode INT NULL COMMENT '平台返回码'
+errmsg VARCHAR(512) NULL COMMENT '平台返回信息'
+success CHAR(1) NOT NULL DEFAULT '0' COMMENT '是否成功'
+remoteID VARCHAR(128) NULL COMMENT '平台侧ID 微信草稿mediaID等'
+operator VARCHAR(64) NULL COMMENT '操作者loginID'
+pushedYMDHMS VARCHAR(16) NULL COMMENT '投递时间'
+label VARCHAR(32) COMMENT 'label'
+memo VARCHAR(200) COMMENT 'memo'
+regID VARCHAR(32) COMMENT '注册ID'
+regYMDHMS VARCHAR(16) COMMENT '注册年月日'
+modifyID VARCHAR(32) COMMENT '修改用户ID'
+modifyYMDHMS VARCHAR(16) COMMENT '修改年月日'
+delFlag CHAR(1) COMMENT '删除标记'</pre>
+
+<h4>（10）ch_mcp_token.txt —— MCP 访问令牌</h4>
+<pre class="ddl">recID BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '记录ID'
+tokenHash CHAR(64) NOT NULL UNIQUE COMMENT 'token的sha256 不存明文'
+tokenName VARCHAR(64) NOT NULL COMMENT '令牌名称'
+tokenScope VARCHAR(64) NOT NULL DEFAULT 'read' COMMENT 'read或write或publish'
+projectCode VARCHAR(64) NULL COMMENT '绑定项目'
+transport VARCHAR(16) NOT NULL DEFAULT 'sse' COMMENT 'sse或stdio'
+lastUseYMDHMS VARCHAR(16) NULL COMMENT '最近使用时间'
+useCount INT NOT NULL DEFAULT 0 COMMENT '累计调用次数'
+revokedYMDHMS VARCHAR(16) NULL COMMENT '吊销时间 有值即失效'
+ownerID VARCHAR(64) NULL COMMENT '创建者loginID'
+label VARCHAR(32) COMMENT 'label'
+memo VARCHAR(200) COMMENT 'memo'
+regID VARCHAR(32) COMMENT '注册ID'
+regYMDHMS VARCHAR(16) COMMENT '注册年月日'
+modifyID VARCHAR(32) COMMENT '修改用户ID'
+modifyYMDHMS VARCHAR(16) COMMENT '修改年月日'
+delFlag CHAR(1) COMMENT '删除标记'</pre>
+
+<h4>（11）ch_audit_log.txt —— 审计日志（归档表）</h4>
+<pre class="ddl">recID BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '记录ID'
+actor VARCHAR(64) NULL COMMENT '操作者 loginID或mcp令牌名'
+source VARCHAR(16) NOT NULL DEFAULT 'web' COMMENT 'web或api或mcp'
+action VARCHAR(64) NOT NULL COMMENT '动作 如topic.create或publish.push'
+targetType VARCHAR(32) NULL COMMENT '对象类型'
+targetID VARCHAR(64) NULL COMMENT '对象ID'
+payloadDigest CHAR(64) NULL COMMENT '入参摘要sha256'
+result VARCHAR(24) NOT NULL DEFAULT 'OK' COMMENT 'OK或FAIL'
+errMsg VARCHAR(512) NULL COMMENT '错误信息'
+costMs INT NULL COMMENT '耗时毫秒'
+ipAddr VARCHAR(64) NULL COMMENT '来源IP'
+label VARCHAR(32) COMMENT 'label'
+memo VARCHAR(200) COMMENT 'memo'
+regID VARCHAR(32) COMMENT '注册ID'
+regYMDHMS VARCHAR(16) COMMENT '注册年月日'
+modifyID VARCHAR(32) COMMENT '修改用户ID'
+modifyYMDHMS VARCHAR(16) COMMENT '修改年月日'
+delFlag CHAR(1) COMMENT '删除标记'</pre>
+
+<h4>（12）ch_topic_version.txt —— 主题版本快照（P2）</h4>
+<pre class="ddl">recID BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '记录ID'
+verKey VARCHAR(64) NOT NULL UNIQUE COMMENT '幂等键 topicID加冒号加versionNo'
+topicID BIGINT NOT NULL COMMENT '关联ch_topic.recID'
+versionNo INT NOT NULL COMMENT '版本号 从1递增'
+snapshotJson MEDIUMTEXT NULL COMMENT '主题完整快照JSON'
+diffNote VARCHAR(512) NULL COMMENT '变更说明'
+ownerID VARCHAR(64) NULL COMMENT '保存者loginID'
+label VARCHAR(32) COMMENT 'label'
+memo VARCHAR(200) COMMENT 'memo'
+regID VARCHAR(32) COMMENT '注册ID'
+regYMDHMS VARCHAR(16) COMMENT '注册年月日'
+modifyID VARCHAR(32) COMMENT '修改用户ID'
+modifyYMDHMS VARCHAR(16) COMMENT '修改年月日'
+delFlag CHAR(1) COMMENT '删除标记'</pre>
+
+<h3>5.4 初始化种子数据</h3>
+<table>
+  <thead><tr><th style="width:18%">表</th><th>种子内容</th></tr></thead>
+  <tbody>
+    <tr><td><code>ch_platform</code></td><td><code>wechat_mp</code>（deliverMode=<code>draft_box</code>、allowSvg=0、needAiLabel=0）、<code>xiaohongshu</code>（deliverMode=<code>asset_pack</code>、imageSpec=<code>1080x1440</code>、needAiLabel=1、autoPublish=0）、<code>generic</code>（deliverMode=<code>asset_pack</code>）</td></tr>
+    <tr><td><code>ch_layout</code></td><td><code>stack_v1</code>（上下展示）、<code>carousel_v1</code>（左右轮播）、<code>longimage_v1</code>（长图拼接），各平台各一套</td></tr>
+    <tr><td><code>ch_account</code></td><td>手工录入，不预置</td></tr>
+  </tbody>
+</table>
+<p>种子走生成器产出的 <code>insert_ch_platform()</code> / <code>insert_ch_layout()</code>，不维护第二份 SQL。</p>
+
+<h3>5.5 归档策略</h3>
+<p><code>ch_audit_log</code> 是唯一大表，<strong>不用分区</strong>（生成器不支持），改：</p>
+<ul>
+  <li><code>regYMDHMS</code> 单列索引</li>
+  <li>每月分批 <code>DELETE ... WHERE regYMDHMS &lt; '20250101000000' LIMIT 5000</code>（循环）</li>
+  <li>保留 24 个月，归档前导出到对象存储</li>
+</ul>
+
+<h2 id="s6"><span class="num">6</span>CRUD 生成方案</h2>
+
+<h3>6.1 生成器工作流</h3>
+<pre class="plain">ch_topic.txt (唯一数据源)
+      │
+      ▼  python mysqlCodeGenerator.py -i database/ch_topic.txt -t topic
+mysqlCodeGenerator.readFromFile()
+      │  anaTableData() 解析每行 → {fieldName, dataType, dataTypeString, rest, isPrimaryKey, text}
+      ▼
+generateFuncs() 产出 5 段代码
+      ├─ tablename_convertor_ch_topic()     表名转换
+      ├─ create_ch_topic(tableName)          建表（内联 DDL）
+      ├─ drop_ / delete_ / insert_ / update_ / query_ch_topic()
+      ├─ functopicAdd / functopicDel / functopicModify / functopicQry   ← REST 处理器
+      ├─ test_ch_topic()                     自测用例
+      └─ msg = '{...}'                       接口测试报文
+      ▼
+auto_generated/auto_gen_code_ch_topic.py   （产物，不手改）
+      +
+auto_generated/word_table_ch_topic.csv     （接口参数文档）
+      │
+      ▼  人工合并
+common/mysqlCommon.py                      （全库读写唯一入口）</pre>
+
+<h3>6.2 命令示例</h3>
+<pre>cd code/src
+
+# 单表生成
+python database/mysqlCodeGenerator.py -i database/ch_topic.txt -t topic
+
+# 批量（12 张表一次跑完）
+for f in database/ch_*.txt; do
+  t=$(basename "$f" .txt | sed 's/^ch_//')
+  python database/mysqlCodeGenerator.py -i "$f" -t "$t"
+done</pre>
+<table>
+  <thead><tr><th style="width:24%">参数</th><th>含义</th></tr></thead>
+  <tbody>
+    <tr><td><code>-i, --input</code></td><td>输入定义文件路径</td></tr>
+    <tr><td><code>-t, --title</code></td><td>REST 处理器名中段（<code>func{Title}Add</code>），首字母自动大写</td></tr>
+    <tr><td><code>-d, --debug</code></td><td>进 pdb</td></tr>
+  </tbody>
+</table>
+
+<h3>6.3 生成器硬约束（红线）</h3>
+<table>
+  <thead><tr><th style="width:4%">#</th><th style="width:32%">约束</th><th style="width:30%">违反后果</th><th>规避</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>首字段必须是 <code>AUTO_INCREMENT</code> 主键</td><td><code>insert_*</code> 签名会多一个主键参数</td><td>一律 <code>recID BIGINT AUTO_INCREMENT PRIMARY KEY</code></td></tr>
+    <tr><td>2</td><td><strong>不支持复合唯一键</strong> <code>UNIQUE KEY (a,b)</code></td><td>生成器不产索引</td><td>应用层拼接单列 + 内联 <code>UNIQUE</code></td></tr>
+    <tr><td>3</td><td><strong>不支持外键</strong></td><td>—</td><td>移除 <code>FOREIGN KEY</code>，应用层保证</td></tr>
+    <tr><td>4</td><td><strong>不支持分区</strong></td><td>—</td><td><code>regYMDHMS</code> 索引 + 分批 DELETE</td></tr>
+    <tr><td>5</td><td>字段行内<strong>单空格</strong>分隔</td><td>解析错位、字段丢失</td><td>严格单空格，禁用 Tab</td></tr>
+    <tr><td>6</td><td><code>COMMENT</code> 中<strong>不能有 %</strong></td><td>生成器替换为全角 ％</td><td>用「百分比」或「pct」</td></tr>
+    <tr><td>7</td><td>字段名/表名不能是 MySQL 保留字</td><td>需反引号，易踩坑</td><td>避开 <code>status</code>→<code>jobStatus</code> 等；生成器已内置保留字表自动加反引号</td></tr>
+    <tr><td>8</td><td><code>PRIMARY KEY</code> 关键字需完整匹配</td><td>字段名含 <code>primary</code>（如 <code>primaryImageUrl</code>）会被误判为主键</td><td>v20260904 版已修复，确保用新版生成器</td></tr>
+  </tbody>
+</table>
+
+<h3>6.4 已知坑（v3 实测发现）</h3>
+<div class="callout warn">
+  <p class="t">坑 1：handleSQL() 路径存在参数错位</p>
+  <pre style="margin:8px 0;background:#fff">def coderGenerator(tableName, fieldsList, cmdTitle="cmd", primaryKeys=[], insertsList=[]): ...
+
+# handleSQL() 内（错位：primaryKeys 传给了 cmdTitle）
+coderGenerator(tableName, fieldsList, primaryKeys, insertsList)
+
+# readFromFile() 内（正确）
+coderGenerator(tableName, fieldsList, cmdTitle=cmdTitle)</pre>
+  <p><strong>影响</strong>：从原生 <code>CREATE TABLE</code> SQL 生成代码的路径会产出 <code>func['xxx']Add</code> 这类非法函数名。</p>
+  <p><strong>规避</strong>：本项目<strong>只走 <code>readFromFile()</code> 路径</strong>（<code>-i ch_*.txt</code>），不动 <code>handleSQL()</code>。若要修，把该行改为关键字传参即可。</p>
+</div>
+<div class="callout warn">
+  <p class="t">坑 2：query_*() 的 limitNum 默认被注释掉</p>
+  <p>生成器把 <code>#if limitNum &gt; 0:</code> 整段注释了，导致查询默认无 LIMIT。本项目表量级到千万（<code>ch_audit_log</code>），<strong>必须在 <code>query_ch_audit_log()</code> 手工补回 LIMIT</strong>，否则一次查询可能拉全表。</p>
+</div>
+<div class="callout warn">
+  <p class="t">坑 3：生成代码对 INT 类型强制 int() 转换，异常时置 0</p>
+  <pre style="margin:8px 0;background:#fff">try:
+    sortWeight = int(dataSet.get("sortWeight"))
+except:
+    sortWeight = 0</pre>
+  <p>对<strong>可空</strong>的 INT 列（如 <code>ch_asset.width</code>）会丢失 NULL 语义，变成 0。规避：可空数值列在业务层约定「0 视为未设置」。</p>
+</div>
+
+<h3>6.5 业务层调用约定</h3>
+<p><strong>唯一入口</strong>：<code>common/mysqlCommon.py</code></p>
+<pre>from common import mysqlCommon as comMysql
+
+tableName = comMysql.tablename_convertor_ch_topic()
+
+currDataList = comMysql.query_ch_topic(tableName, recID)      # 查
+recID        = comMysql.insert_ch_topic(tableName, saveSet)   # 增
+rtn          = comMysql.update_ch_topic(tableName, recID, saveSet)  # 改
+rtn          = comMysql.delete_ch_topic(tableName, recID)     # 删</pre>
+<p><strong>幂等写入模板</strong>（生成器不支持 <code>ON DUPLICATE KEY</code>，统一走「查唯一键 → 命中更新 / 未命中插入」）：</p>
+<pre>def upsertByUniqueKey(uniqueValue, saveSet, queryFn, insertFn, updateFn, tableName):
+    """按唯一键幂等写入"""
+    dataList = queryFn(tableName, uniqueValue)
+    if len(dataList) == 1:
+        recID = dataList[0].get("recID")
+        updateFn(tableName, recID, saveSet)
+        return recID
+    return insertFn(tableName, saveSet)</pre>
+<table>
+  <thead><tr><th style="width:22%">表</th><th style="width:22%">唯一键</th><th>拼接规则</th></tr></thead>
+  <tbody>
+    <tr><td><code>ch_topic_asset</code></td><td><code>assetKey</code></td><td><code>{topicID}:{fileID}</code></td></tr>
+    <tr><td><code>ch_artifact</code></td><td><code>artifactKey</code></td><td><code>{jobID}:{kind}:{platform}:{seqNo}</code></td></tr>
+    <tr><td><code>ch_topic_version</code></td><td><code>verKey</code></td><td><code>{topicID}:{versionNo}</code></td></tr>
+    <tr><td><code>ch_asset</code></td><td><code>contentHash</code></td><td><code>sha256(原始字节).hexdigest()</code></td></tr>
+    <tr><td><code>ch_publish_record</code></td><td><code>idempotencyKey</code></td><td>调用方传入（推荐 <code>{artifactID}:{accountID}:{uuid4}</code>）</td></tr>
+    <tr><td><code>ch_mcp_token</code></td><td><code>tokenHash</code></td><td><code>sha256(token).hexdigest()</code></td></tr>
+  </tbody>
+</table>
+
+<h3>6.6 REST 端点映射</h3>
+<table>
+  <thead><tr><th style="width:20%">表</th><th>add</th><th>del</th><th>modify</th><th>qry</th></tr></thead>
+  <tbody>
+    <tr><td><code>ch_topic</code></td><td><code>topicadd</code></td><td><code>topicdel</code></td><td><code>topicmodify</code></td><td><code>topicqry</code></td></tr>
+    <tr><td><code>ch_topic_asset</code></td><td><code>topicassetadd</code></td><td><code>topicassetdel</code></td><td><code>topicassetmodify</code></td><td><code>topicassetqry</code></td></tr>
+    <tr><td><code>ch_asset</code></td><td><code>assetadd</code></td><td><code>assetdel</code></td><td><code>assetmodify</code></td><td><code>assetqry</code></td></tr>
+    <tr><td><code>ch_layout</code></td><td><code>layoutadd</code></td><td><code>layoutdel</code></td><td><code>layoutmodify</code></td><td><code>layoutqry</code></td></tr>
+    <tr><td><code>ch_platform</code></td><td><code>platformadd</code></td><td><code>platformdel</code></td><td><code>platformmodify</code></td><td><code>platformqry</code></td></tr>
+    <tr><td><code>ch_render_job</code></td><td><code>renderjobadd</code></td><td><code>renderjobdel</code></td><td><code>renderjobmodify</code></td><td><code>renderjobqry</code></td></tr>
+    <tr><td><code>ch_artifact</code></td><td><code>artifactadd</code></td><td><code>artifactdel</code></td><td><code>artifactmodify</code></td><td><code>artifactqry</code></td></tr>
+    <tr><td><code>ch_account</code></td><td><code>accountadd</code></td><td><code>accountdel</code></td><td><code>accountmodify</code></td><td><code>accountqry</code></td></tr>
+    <tr><td><code>ch_publish_record</code></td><td><code>publishrecordadd</code></td><td><code>publishrecorddel</code></td><td><code>publishrecordmodify</code></td><td><code>publishrecordqry</code></td></tr>
+    <tr><td><code>ch_mcp_token</code></td><td><code>mcptokenadd</code></td><td><code>mcptokendel</code></td><td><code>mcptokenmodify</code></td><td><code>mcptokenqry</code></td></tr>
+    <tr><td><code>ch_audit_log</code></td><td><code>auditlogadd</code></td><td><code>auditlogdel</code></td><td><code>auditlogmodify</code></td><td><code>auditlogqry</code></td></tr>
+    <tr><td><code>ch_topic_version</code></td><td><code>topicversionadd</code></td><td><code>topicversiondel</code></td><td><code>topicversionmodify</code></td><td><code>topicversionqry</code></td></tr>
+  </tbody>
+</table>
+
+<h4>角色裁剪（写入 config/basicSettings.py 的 ROLE_CMD_LIST）</h4>
+<table>
+  <thead><tr><th style="width:26%">角色</th><th>权限</th></tr></thead>
+  <tbody>
+    <tr><td><code>administrator</code> / <code>manager</code></td><td>全部 48 个端点</td></tr>
+    <tr><td><code>operator</code></td><td>主题 / 素材 / 渲染 / 产物 / 发布 全权限；账号 / 令牌 / MCP 只读</td></tr>
+    <tr><td><code>customer</code></td><td>全部只读（<code>*qry</code>）</td></tr>
+    <tr><td><code>visitor</code></td><td>仅 <code>ch_platform</code> / <code>ch_layout</code> / <code>ch_artifact</code> 只读</td></tr>
+  </tbody>
+</table>
+
+<h4>业务专用端点（不走生成器，手工实现）</h4>
+<table>
+  <thead><tr><th style="width:26%">端点</th><th>作用</th></tr></thead>
+  <tbody>
+    <tr><td><code>topicrender</code></td><td>触发渲染（建 job + 异步执行）</td></tr>
+    <tr><td><code>artifactpack</code></td><td>打包素材包 ZIP</td></tr>
+    <tr><td><code>publishpush</code></td><td>推送公众号草稿</td></tr>
+    <tr><td><code>publishcheck</code></td><td>合规与规格校验（不落库，返回问题清单）</td></tr>
+    <tr><td><code>accounthealth</code></td><td>凭据健康检查</td></tr>
+    <tr><td><code>mcpinvoke</code></td><td>MCP tool 统一入口</td></tr>
+  </tbody>
+</table>
+
+<h2 id="s7"><span class="num">7</span>目录结构</h2>
+<pre class="plain">contenthub/
+├── plan/                                    # 设计文档
+│   ├── 开发计划.md                           # 【本文】
+│   └── platforms.json                        # 平台能力矩阵配置（种子来源）
+└── code/
+    └── src/
+        ├── common/                          # 公共层（大部分复用 ylwz）
+        │   ├── mysqlCommon.py               # ★ 全库读写唯一入口（生成器产物）
+        │   ├── mysqlHandle.py               # 连接池 executeRead / executeWrite
+        │   ├── fileStorageCommon.py         # ★ 新增：文件存储统一门面
+        │   ├── aliyunOSS.py                 # 【复用】阿里云适配器
+        │   ├── tencentCOS.py                # 【复用】腾讯云适配器
+        │   ├── selfFileCommon.py            # 【复用】本地文件适配器
+        │   ├── funcCommon.py                # 【复用】genDigest / rtnMSG / fileServerRequest
+        │   ├── miscCommon.py                # 【复用】getTime / setLogNew / jsonLoads
+        │   ├── globalDefinition.py          # 【复用】全局常量
+        │   ├── redisCommon.py               # 【复用】查询缓冲
+        │   ├── chCommon.py                  # ★ 新增：本项目公共封装（对齐 museumCommon）
+        │   └── accountClient.py             # ★ 新增：账号服务客户端
+        ├── config/
+        │   ├── local_settings.py            # _SYS 环境选择入口
+        │   ├── basicSettings.py             # FILE_SYSTEM_MODE / ROLE_CMD_LIST / 规格
+        │   ├── aliyunSettings.py            # OSS 桶与 AK
+        │   ├── tencentSettings.py           # COS 桶与 AK
+        │   ├── selfFileSettings.py          # 本地存储目录与分片
+        │   ├── mysqlSettings.py             # DB 连接
+        │   ├── redisSettings.py             # Redis 连接
+        │   └── wechatSettings.py            # ★ 公众号 appID/secret/模板ID
+        ├── database/                        # ★ 表定义目录（唯一数据源）
+        │   ├── ch_topic.txt
+        │   ├── ch_topic_asset.txt
+        │   ├── ch_asset.txt
+        │   ├── ch_layout.txt
+        │   ├── ch_platform.txt
+        │   ├── ch_render_job.txt
+        │   ├── ch_artifact.txt
+        │   ├── ch_account.txt
+        │   ├── ch_publish_record.txt
+        │   ├── ch_mcp_token.txt
+        │   ├── ch_audit_log.txt
+        │   ├── ch_topic_version.txt
+        │   ├── mysqlCodeGenerator.py        # 【不动】代码生成器
+        │   └── auto_generated/              # 生成器产物落点
+        ├── engine/                          # ★ 渲染引擎
+        │   ├── layoutEngine.py              # 版式调度
+        │   ├── inlineStyle.py               # 微信内联样式器
+        │   ├── htmlToImage.py               # Playwright 截图
+        │   ├── imageProc.py                 # Pillow 处理
+        │   └── templates/                   # Jinja2 模板
+        │       ├── stack_v1/
+        │       ├── carousel_v1/
+        │       └── longimage_v1/
+        ├── processor/                       # 业务处理器
+        │   ├── topicService.py              # C2
+        │   ├── assetService.py              # C3
+        │   ├── publishService.py            # C6
+        │   ├── complianceService.py         # C8
+        │   ├── mcpHub.py                    # C7
+        │   └── platformAdapter/             # C5
+        │       ├── base.py                  # PlatformAdapter 抽象基类
+        │       ├── wechatMp.py
+        │       ├── xiaohongshu.py
+        │       └── generic.py
+        ├── schedule/                        # cron 调度
+        │   ├── renderWorker.py              # 渲染队列消费者
+        │   ├── credentialCheck.py           # 凭据健康巡检
+        │   └── archive.py                   # ch_audit_log 归档
+        ├── monitor/                         # 监控告警
+        ├── tools/                           # 运维脚本
+        │   ├── initSeed.py                  # 灌种子（platform / layout）
+        │   └── initTables.py                # 建表（调 create_ch_*）
+        ├── test/
+        └── main/                            # 进程入口
+            ├── chAPI.py                     # Flask 主入口（/chapi）
+            ├── chAPIPost.py                 # urlPathMap 路由分发
+            └── mcpServer.py                 # MCP Server (SSE / stdio)</pre>
+
+<h2 id="s8"><span class="num">8</span>阶段划分与里程碑</h2>
+<table>
+  <thead><tr><th style="width:13%">阶段</th><th style="width:8%">周期</th><th style="width:55%">内容</th><th>里程碑</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Phase 0</strong><br>地基</td><td>1–2 周</td>
+      <td>① <strong>Day 1 启动企业号认证</strong>（外部审核 2–4 周）② 目录骨架 + config 七文件 ③ 12 个 <code>ch_*.txt</code> + 生成器跑通 ④ <code>fileStorageCommon.py</code> 门面 + 三后端联调 ⑤ <code>plan.md</code></td>
+      <td><span class="pill p0">M0</span> 定义文件与抽象层冻结</td>
+    </tr>
+    <tr>
+      <td><strong>Phase 1</strong><br>主题与素材</td><td>3–6 周</td>
+      <td>C1 接入权限 → C2 主题管理（含字段区间校验）→ C3 素材图库（三后端切换 + contentHash 去重）→ C4 版式引擎（<strong>先硬编码 3 套模板</strong>）</td>
+      <td><span class="pill p1">M1</span> 主题可建、素材可传、版式可预览</td>
+    </tr>
+    <tr>
+      <td><strong>Phase 2</strong><br>渲染与产物</td><td>7–9 周</td>
+      <td>C5 平台适配（微信内联化 + 小红书图集卡片）→ C8 合规校验 → <code>ch_artifact</code> 产物管理</td>
+      <td><span class="pill p1">M2</span> 可渲染出双平台合规产物</td>
+    </tr>
+    <tr>
+      <td><strong>Phase 3</strong><br>投递与开放</td><td>10–12 周</td>
+      <td>C6 发布投递（公众号推草稿 + 素材包 ZIP）→ C7 MCP Hub（8 tool + Token + 审计）→ 归档 + 监控</td>
+      <td><span class="pill p2">M3</span> 可投递 + AI 可编排，v1.0</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>关键路径</h3>
+<pre class="plain">外部：企业号认证 ──────────────────────────► C6 公众号草稿投递
+主干：Phase 0 ─► C2 ─► C3 ─► C4 ─► C5 ─► 产物 ─► C6 ─► C7
+                                        └─► C8（横切校验）</pre>
+<div class="callout ok">
+  <p class="t">抗风险设计</p>
+  主干<strong>完全不依赖外部审核</strong>。即使企业号卡住，Phase 1–2 依然能交付「素材包导出」完整形态。<strong>资质是加速项，不是阻塞项。</strong>
+</div>
+
+<h2 id="s9"><span class="num">9</span>风险登记册</h2>
+<table>
+  <thead><tr><th style="width:4%">#</th><th style="width:20%">风险</th><th style="width:8%">等级</th><th style="width:32%">说明</th><th>缓解</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td><strong>版式引擎工作量被低估</strong></td><td><span class="pill p0">高</span></td><td>三平台形态差异大，抽象过度会耗死</td><td>Phase 1 硬编码 3 套模板跑通端到端，再抽 DSL</td></tr>
+    <tr><td>2</td><td>微信图片外链不显示</td><td><span class="pill p0">高</span></td><td>微信正文外链图一律不渲染，class 被清洗</td><td>全量内联样式 + 转 <code>mmbiz.qpic.cn</code>；SVG 交互配静态图集兜底</td></tr>
+    <tr><td>3</td><td>凭据静默失效</td><td><span class="pill p0">高</span></td><td>Token 过期/改密后失效且不通知，只表现为投递失败</td><td><code>credentialCheck.py</code> 巡检 + <code>healthStatus</code> 告警</td></tr>
+    <tr><td>4</td><td>误发 / 重复推送</td><td><span class="pill p0">高</span></td><td>订阅号 1 次/天、服务号 4 次/月，误发不可撤回</td><td><code>idempotencyKey</code> 幂等 + 二次确认 + 历史记录展示</td></tr>
+    <tr><td>5</td><td>生成器 <code>handleSQL</code> 参数错位</td><td><span class="pill p1">中</span></td><td>从原生 SQL 生成会产出非法函数名</td><td>只走 <code>readFromFile()</code> 路径；或改关键字传参</td></tr>
+    <tr><td>6</td><td><code>query_*</code> 默认无 LIMIT</td><td><span class="pill p1">中</span></td><td><code>ch_audit_log</code> 千万级时可能拉全表</td><td>手工补回 LIMIT；或统一在业务层限制</td></tr>
+    <tr><td>7</td><td>生成器 INT 强转丢 NULL</td><td><span class="pill p1">中</span></td><td>可空 INT 列被写成 0</td><td>可空数值列约定「0 = 未设置」</td></tr>
+    <tr><td>8</td><td>中途切换文件后端</td><td><span class="pill p1">中</span></td><td>历史 fileID 语义不同，可能读不到</td><td><code>ch_asset.fileSystem</code> 快照；读取时按快照路由</td></tr>
+    <tr><td>9</td><td>MCP 协议演进</td><td><span class="pill p1">中</span></td><td>MCP 标准仍在演进</td><td>MCP 层只做薄适配，业务逻辑在应用层</td></tr>
+    <tr><td>10</td><td>企业号认证周期</td><td><span class="pill p2">低</span></td><td>外部审核 2–4 周不可控</td><td>Day 1 启动；主干不依赖</td></tr>
+    <tr><td>11</td><td>渲染产物存储膨胀</td><td><span class="pill p2">低</span></td><td>多版式产生大量 PNG 变体</td><td><code>expireYMDHMS</code> 保留期 + 定时清理</td></tr>
+  </tbody>
+</table>
+
+<h2 id="s10"><span class="num">10</span>下一步</h2>
+<p>按「plan.md → 编码 → 迭代」流程，Phase 0 的可执行交付物：</p>
+<table>
+  <thead><tr><th style="width:6%">#</th><th style="width:26%">交付物</th><th>内容</th></tr></thead>
+  <tbody>
+    <tr><td>A</td><td><code>plan.md</code></td><td>目录骨架、模块边界、接口约定、配置项清单、MCP 协议选型结论</td></tr>
+    <tr><td>B</td><td><strong>12 个 <code>ch_*.txt</code></strong></td><td>本文第 5.3 节全文可直接落盘</td></tr>
+    <tr><td>C</td><td><strong>生成器跑通报告</strong></td><td>12 张表批量生成 → 合并 <code>mysqlCommon.py</code> → 建表脚本执行验证</td></tr>
+    <tr><td>D</td><td><code>fileStorageCommon.py</code> + 三后端联调</td><td>SELFFILE 本地跑通 → ALIOSS / TENCENT 切配置验证</td></tr>
+    <tr><td>E</td><td>版式 DSL 草案</td><td>上下 / 轮播 / 长图三种版式语义 + 各一套 JSON 示例</td></tr>
+  </tbody>
+</table>
+
+<div class="callout">
+  <p class="t">需 Steven 拍板的 2 个细节</p>
+  <ol style="margin:6px 0">
+    <li><strong>文件服务接入模式</strong>：Web 走 HTTP 文件服务（模式 A）+ worker 走进程内直连（模式 B）的混合方案，是否认可？还是统一走 A？</li>
+    <li><strong>项目前缀</strong>：表名统一用 <code>ch_</code>（content hub）是否符合你的命名习惯？还是沿用其他前缀（如 <code>mc_</code> / <code>ct_</code>）？</li>
+  </ol>
+</div>
+
+<footer>
+  内容管理与多平台发布平台 · 开发计划 v3 · 2026-09-17 · 阿枢整理<br>
+  参考基线：<code>ylwzProject/museum</code>（国外博物馆文物展示项目）<br>
+  配套文档：<code>content-hub-开发计划v3.md</code> · <code>content-hub-开发计划v2.html</code> · <code>content-hub-调研与开发计划.html</code>
+</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,32 @@
+# contentHub(内容中枢) 运行依赖
+# 说明:
+#   - SP1(数据库链路)只需要 pymysql;
+#   - redis / requests / Jinja2 / Pillow 在 SP2 起使用, Flask 在 SP1.5 起使用,
+#     playwright 在 SP3(小红书卡片截图)使用, mcp/uvicorn/pydantic 在 MCP 服务使用;
+#   - 云厂商 SDK 与多桶能力: 已存在的 common/aliyunOSS.py 与 common/tencentCOS.py 依赖
+#     oss2 / cos-python-sdk-v5, 仅在启用 ALIOSS/TENCENT 后端的环境安装(本地开发用 SELFFILE);
+#   - 具体版本以部署环境实测为准, 此处给出最低可用版本, 不锁死补丁号。
+
+pymysql>=1.1.0
+redis>=5.0.0
+requests>=2.31.0
+Jinja2>=3.1.0
+Pillow>=10.0.0
+Flask>=3.0.0
+gunicorn>=21.2.0
+playwright>=1.44.0
+
+# 凭据加密(AES-256-GCM; SP4a · C6 投递链路, 见 common/credentialCipher.py)
+cryptography>=42.0.0
+
+# MCP 服务(streamable-http 传输, 见 code/src/mcpapi/)
+# ★ SP4b 实测: 必须锁 `mcp<2` —— mcp 2.x 已把 FastMCP 更名为 MCPServer 且鉴权/传输 API 变更,
+#   `mcpapi/mcp_entry.py`(独立只读层, 不得改动其既有逻辑)基于 v1 的
+#   `mcp.server.fastmcp.FastMCP` + `mcp.server.auth.*` 实现, 装 2.x 会在导入期直接报错。
+mcp>=1.2.0,<2
+uvicorn>=0.30.0
+pydantic>=2.7.0
+
+# 云端文件后端(按需安装)
+# oss2>=2.18.0
+# cos-python-sdk-v5>=1.9.30

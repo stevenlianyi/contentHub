@@ -1,0 +1,68 @@
+{#
+  carousel_v1 · 左右轮播(公众号无原生轮播, 交互由本项目自实现: HTML + JS)。
+  specJson 键(见 tools/initSeed.py): size / ratio / maxCount / allowSvg / needStaticFallback。
+  ★ 静态图集兜底必须产出(公众号对 SVG/脚本兼容不稳), 与交互区并存, 供不支持脚本时降级阅读。
+  说明: 交互钩子一律用 data-* 属性(不用 class 语义); 样式 scoped 到 data-layout 根节点。
+#}
+{% extends "partials/base.html" %}
+{% block style %}
+[data-layout="carousel_v1"] img{max-width:100%;}
+{% endblock %}
+{% block content %}
+<section data-layout="carousel_v1" data-interactive="1" data-card-count="{{ meta.slideCount }}" data-ratio="{{ meta.ratio }}" data-size="{{ meta.size }}"
+         style="max-width:{{ cardWidth }}px;margin:0 auto;background:#fff;position:relative;">
+  <div data-carousel-viewport="1" style="width:100%;overflow:hidden;position:relative;">
+    {% for item in slideList %}
+    <figure data-carousel-slide="1" data-seqno="{{ item.seqNo }}" data-sort-order="{{ item.sortOrder }}" style="width:100%;margin:0;{% if not loop.first %}display:none;{% endif %}">
+      <img src="{{ item.fileUrl }}" alt="{{ item.caption }}" style="width:100%;display:block;"/>
+      {% if item.caption %}
+      <figcaption data-carousel-caption="1" style="margin-top:6px;color:#888;font-size:13px;text-align:center;">{{ item.caption }}</figcaption>
+      {% endif %}
+    </figure>
+    {% endfor %}
+  </div>
+  <div data-carousel-controls="1" style="text-align:center;padding:10px 0;">
+    <button type="button" data-carousel-prev="1" style="min-width:72px;height:32px;border:1px solid #ddd;background:#fff;border-radius:16px;cursor:pointer;">上一张</button>
+    <span data-carousel-indicator="1" style="display:inline-block;min-width:64px;color:#666;font-size:13px;">1 / {{ meta.slideCount }}</span>
+    <button type="button" data-carousel-next="1" style="min-width:72px;height:32px;border:1px solid #ddd;background:#fff;border-radius:16px;cursor:pointer;">下一张</button>
+  </div>
+  <script type="text/javascript">
+  {% raw %}
+  (function(){
+    var root = document.querySelector('[data-layout="carousel_v1"]');
+    if (!root) { return; }
+    var slides = root.querySelectorAll('[data-carousel-slide]');
+    var indicator = root.querySelector('[data-carousel-indicator]');
+    var index = 0;
+    function show(next) {
+      if (!slides.length) { return; }
+      if (next < 0) { next = slides.length - 1; }
+      if (next >= slides.length) { next = 0; }
+      for (var i = 0; i < slides.length; i++) {
+        slides[i].style.display = (i === next) ? 'block' : 'none';
+      }
+      index = next;
+      if (indicator) { indicator.textContent = (index + 1) + ' / ' + slides.length; }
+    }
+    var prevBtn = root.querySelector('[data-carousel-prev]');
+    var nextBtn = root.querySelector('[data-carousel-next]');
+    if (prevBtn) { prevBtn.addEventListener('click', function(){ show(index - 1); }); }
+    if (nextBtn) { nextBtn.addEventListener('click', function(){ show(index + 1); }); }
+    show(0);
+  })();
+  {% endraw %}
+  </script>
+</section>
+
+<section data-carousel-fallback="static" data-static-count="{{ meta.fallbackCount }}" style="max-width:{{ cardWidth }}px;margin:16px auto 0 auto;background:#fff;padding:12px;box-sizing:border-box;">
+  <h3 data-fallback-title="1" style="margin:0 0 12px 0;font-size:16px;color:#333;">静态图集(兜底)</h3>
+  {% for item in fallbackList %}
+  <figure data-static-seqno="{{ item.seqNo }}" style="margin:0 0 12px 0;">
+    <img src="{{ item.fileUrl }}" alt="{{ item.caption }}" style="width:100%;display:block;border-radius:6px;"/>
+    {% if item.caption %}
+    <figcaption style="margin-top:6px;color:#888;font-size:13px;text-align:center;">{{ item.caption }}</figcaption>
+    {% endif %}
+  </figure>
+  {% endfor %}
+</section>
+{% endblock %}

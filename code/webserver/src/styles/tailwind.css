@@ -1,0 +1,109 @@
+/* ============================================================================
+ * 内容中枢 · Tailwind 入口样式（计划 §2.3 / Step 1）
+ * ----------------------------------------------------------------------------
+ * ① 三件套：@tailwind base / components / utilities
+ * ② @layer base      —— 画布底色、字体、焦点可见、滚动条、过渡与动效降级
+ * ③ @layer utilities —— 极少数组合工具类（.ch-card 等），取值全部引用 --ch-* 变量
+ * 约束（§2.11）：颜色只用 Token；焦点永远可见（禁止 outline: none）；
+ *               prefers-reduced-motion: reduce 下关闭全部非必要动效。
+ * ========================================================================== */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* 主界面固定暗色：与 main.js 写入的 <html class="dark"> 一致 */
+  html.dark {
+    color-scheme: dark;
+  }
+
+  /* 预览区强制浅色（.preview-scope 定义见 element-vars.css，此处兜底原生控件配色） */
+  .preview-scope {
+    color-scheme: light;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background-color: var(--ch-bg-base);
+    color: var(--ch-text-primary);
+    font-family: var(--ch-font-cjk);
+    font-size: var(--ch-font-size-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* 焦点可见：统一 2px 主色描边 + 2px 偏移（无障碍硬要求，禁止移除） */
+  *:focus-visible {
+    outline: 2px solid #3B82F6; /* tokens.border.focus */
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: var(--ch-primary-subtle);
+    color: var(--ch-text-primary);
+  }
+
+  /* 自定义滚动条：细、低对比，不抢视觉层级 */
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: var(--ch-border-default) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--ch-border-default);
+    background-clip: content-box;
+    border: 2px solid transparent;
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--ch-border-light);
+  }
+
+  ::-webkit-scrollbar-corner {
+    background-color: transparent;
+  }
+
+  /* 动效降级（§2.3.4）：关闭全部非必要动效 */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer utilities {
+  /* 卡片：surface 底 + 1px border + radius 12 + padding 20（默认不用阴影，靠 border 分层） */
+  .ch-card {
+    background-color: var(--ch-bg-surface);
+    border: 1px solid var(--ch-border-default);
+    border-radius: var(--ch-radius-xl);
+    padding: var(--ch-space-xl);
+  }
+
+  /* 紧凑卡片：padding 16（§2.3.3 固定约定） */
+  .ch-card--compact {
+    padding: var(--ch-space-lg);
+  }
+
+  /* 长文本量度上限 720px（§2.3.2：详述预览等长文本单行最大宽度） */
+  .ch-measure {
+    max-width: 720px;
+  }
+}

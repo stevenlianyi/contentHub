@@ -1,0 +1,39 @@
+# ============================================================
+# contentHub 版本库忽略规则
+# 目的：仅纳入源码与正式文档，排除本地环境覆盖、编译缓存与运行时生成物
+# ============================================================
+
+# ---- 本地环境覆盖（Vite 约定：.local 不纳入版本库）----
+.env*.local
+
+# ---- Python 编译缓存 / 虚拟环境 ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+ENV/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ---- 前端 / Node ----
+node_modules/
+dist/
+dist-ssr/
+coverage/
+
+# ---- 日志与运行时生成物 ----
+*.log
+logs/
+*.sqlite3
+*.db
+
+# ---- 编辑器 / 系统 ----
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,60 @@
+{#
+  stack_v1 · 上下展示(纵向顺序阅读)。
+  specJson 键(见 tools/initSeed.py): maxWidth / fontSize / lineHeight / paragraphGap。
+  结构: 标题 -> 简介 -> 封面 -> 正文 -> 附图(按 sortOrder, 图注随图)。
+  说明: 结构以 data-* 与内联 style 表达, 不依赖 class 语义(为 SP3 微信内联化留余地)。
+#}
+{% extends "partials/base.html" %}
+{% block style %}
+[data-layout="stack_v1"] img{max-width:100%;}
+{% endblock %}
+{% block content %}
+<article data-layout="stack_v1"
+         style="max-width:{{ meta.maxWidth }};margin:0 auto;padding:16px;box-sizing:border-box;background:#fff;color:#222;font-size:{{ meta.fontSize }};line-height:{{ meta.lineHeight }};">
+  <h1 data-block="title" style="margin:0 0 12px 0;font-size:22px;line-height:1.4;font-weight:700;">{{ topic.title }}</h1>
+
+  {% if topic.summary %}
+  <p data-block="summary" style="margin:0 0 12px 0;color:#666;font-size:15px;">{{ topic.summary }}</p>
+  {% endif %}
+
+  {% if topic.author or topic.source or topic.location or topic.period %}
+  <p data-block="meta" style="margin:0 0 12px 0;color:#999;font-size:13px;">
+    {% if topic.author %}<span data-meta="author">作者: {{ topic.author }}</span>{% endif %}
+    {% if topic.source %}<span data-meta="source"> · 来源: {{ topic.source }}</span>{% endif %}
+    {% if topic.location %}<span data-meta="location"> · 地点: {{ topic.location }}</span>{% endif %}
+    {% if topic.period %}<span data-meta="period"> · 时期: {{ topic.period }}</span>{% endif %}
+  </p>
+  {% endif %}
+
+  {% if topic.coverUrl %}
+  <figure data-block="cover" data-seqno="0" style="margin:0 0 {{ meta.paragraphGap }} 0;">
+    <img src="{{ topic.coverUrl }}" alt="{{ topic.title }}" style="width:100%;display:block;border-radius:6px;"/>
+  </figure>
+  {% endif %}
+
+  <section data-block="body" style="margin:0 0 {{ meta.paragraphGap }} 0;">
+    {% if topic.paragraphs %}
+      {% for para in topic.paragraphs %}
+      <p data-block="paragraph" style="margin:0 0 {{ meta.paragraphGap }} 0;">{{ para }}</p>
+      {% endfor %}
+    {% elif topic.descriptionUrl %}
+      <p data-block="paragraph" style="margin:0 0 {{ meta.paragraphGap }} 0;color:#666;">正文较长, 已转存为文件: <a href="{{ topic.descriptionUrl }}">查看全文</a></p>
+    {% endif %}
+  </section>
+
+  {% for asset in assets %}
+  <figure data-block="asset" data-seqno="{{ asset.seqNo }}" data-sort-order="{{ asset.sortOrder }}" data-usage="{{ asset.usageType }}" style="margin:0 0 {{ meta.paragraphGap }} 0;">
+    <img src="{{ asset.fileUrl }}" alt="{{ asset.caption }}" style="width:100%;display:block;border-radius:6px;"/>
+    {% if asset.caption %}
+    <figcaption data-block="caption" data-caption-seqno="{{ asset.seqNo }}" style="margin-top:6px;color:#888;font-size:13px;text-align:center;">{{ asset.caption }}</figcaption>
+    {% endif %}
+  </figure>
+  {% endfor %}
+
+  {% if topic.tagList %}
+  <p data-block="tags" style="margin:8px 0 0 0;color:#3b7ddd;font-size:13px;">
+    {% for tag in topic.tagList %}<span data-tag="{{ tag }}" style="margin-right:8px;">#{{ tag }}</span>{% endfor %}
+  </p>
+  {% endif %}
+</article>
+{% endblock %}

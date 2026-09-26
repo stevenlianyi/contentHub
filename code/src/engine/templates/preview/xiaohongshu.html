@@ -1,0 +1,30 @@
+{#
+  站内预览(P1-8) · 小红书手机框模拟页。
+  入参: layoutFragment(已渲染的版式片段, 以 safe 注入) / topic / meta / platformName。
+  说明: 仅做视觉模拟, 不做任何小红书接口调用/自动发布; 多图以纵向卡片列表呈现(滑动由平台原生提供)。
+#}
+{% extends "partials/base.html" %}
+{% block style %}
+[data-preview="xiaohongshu"]{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;}
+[data-preview="xiaohongshu"] [data-phone-screen]::-webkit-scrollbar{width:0;}
+{% endblock %}
+{% block content %}
+<div data-preview="xiaohongshu" style="min-height:100vh;background:#f2f3f5;padding:24px 0;display:flex;justify-content:center;">
+  <div data-phone-frame="xiaohongshu" style="width:375px;background:#1c1c1e;border-radius:38px;padding:12px;box-shadow:0 12px 32px rgba(0,0,0,0.25);">
+    <div style="height:24px;display:flex;align-items:center;justify-content:center;color:#eee;font-size:12px;">{{ platformName }}</div>
+    <div data-phone-screen="xiaohongshu" style="width:100%;height:640px;overflow:auto;background:#fff;border-radius:10px;">
+      <div data-note-header="1" style="padding:12px;border-bottom:1px solid #f0f0f0;">
+        <div style="font-size:15px;font-weight:600;color:#222;">{{ topic.title }}</div>
+        {% if topic.author %}<div style="margin-top:6px;font-size:12px;color:#999;">@{{ topic.author }}</div>{% endif %}
+      </div>
+      {{ layoutFragment | safe }}
+      {% if topic.tagList %}
+      <div data-note-tags="1" style="padding:12px;">
+        {% for tag in topic.tagList %}<span style="margin-right:8px;color:#3b7ddd;font-size:13px;">#{{ tag }}</span>{% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    <div style="height:20px;"></div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>contentHub · 主题库 — AppShell</title>
+<style>
+/* ============================================================================
+   contentHub AppShell
+   1:1 还原自 Ardot 画布「contentHub UI 设计规范」/ F4 页面示例 AppShell
+   Screen 画布尺寸 1344 x 780  ·  保留原始像素 + 等比缩放
+   Token 命名与 v1.1 规范 10.x 节保持一致
+   ========================================================================= */
+
+:root{
+  /* ---- 底色层级 Background ---- */
+  --ch-bg-base:     #030712;
+  --ch-bg-sidebar:  #111827;
+  --ch-bg-surface:  #1F2937;
+  --ch-bg-elevated: #374151;
+  --ch-bg-input:    #0B1220;
+  --ch-bg-hover:    rgba(31, 41, 55, .30);   /* bg/hover = bg/surface 30% */
+
+  /* ---- 文字层级 Text ---- */
+  --ch-text-primary:   #F3F4F6;
+  --ch-text-secondary: #9CA3AF;
+  --ch-text-tertiary:  #6B7280;
+  --ch-text-disabled:  #4B5563;
+  --ch-text-inverse:   #111827;
+
+  /* ---- 功能色 Functional ---- */
+  --ch-primary:        #3B82F6;
+  --ch-primary-active: #2563EB;
+  --ch-success:        #10B981;
+  --ch-warning:        #F59E0B;
+  --ch-danger:         #EF4444;
+  --ch-info:           #06B6D4;   /* 「已渲染」完成度指示色 */
+
+  /* ---- 平台识别色 Platform ---- */
+  --ch-wechat:  #07C160;
+  --ch-xhs:     #FF2442;
+  --ch-generic: #6B7280;
+
+  /* ---- 描边 Border ---- */
+  --ch-border:       #374151;   /* border/default */
+  --ch-border-light: #4B5563;   /* border/light */
+  --ch-border-focus: #3B82F6;   /* border/focus */
+
+  /* ---- 间距刻度 Spacing · 4px 基准 ---- */
+  --sp-xs: 4px;  --sp-sm: 8px;  --sp-md: 12px; --sp-lg: 16px; --sp-xl: 20px;
+  --sp-2xl: 24px; --sp-3xl: 32px; --sp-4xl: 40px; --sp-5xl: 48px;
+
+  /* ---- 圆角 Radius ---- */
+  --r-sm: 4px; --r-md: 6px; --r-lg: 8px; --r-xl: 12px; --r-2xl: 16px; --r-full: 999px;
+
+  /* ---- 阴影与描边 Elevation ---- */
+  --sh-raised: 0 4px 16px rgba(0, 0, 0, .40);
+  --sh-modal:  0 8px 32px rgba(0, 0, 0, .50);
+  --sh-focus:  0 0 0 3px rgba(59, 130, 246, .25);
+
+  /* ---- 字体 ---- */
+  --font-cjk: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-mono: "JetBrains Mono", Consolas, ui-monospace, monospace;
+
+  /* ---- 结构常量（来自 4.1 全局框架）---- */
+  --shell-w: 1344px;
+  --shell-h: 780px;
+  --sidebar-w: 240px;
+  --topbar-h: 56px;
+  --nav-h: 36px;
+  --col-status: 96px;
+  --col-platform: 180px;
+  --col-updated: 110px;
+}
+
+*,*::before,*::after{ box-sizing: border-box; }
+
+html,body{ height:100%; margin:0; }
+body{
+  background: var(--ch-bg-base);
+  font-family: var(--font-cjk);
+  color: var(--ch-text-primary);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* 画布容器：锁死 1344x780，整体等比缩放居中，不重排 */
+.stage{
+  position: absolute;
+  left: 50%; top: 50%;
+  width: var(--shell-w);
+  height: var(--shell-h);
+  transform-origin: center center;
+}
+
+/* ============================================================================
+   Screen  1344 x 780  ·  radius 16  ·  border 1px
+   ========================================================================= */
+.screen{
+  display: flex;
+  width: 100%; height: 100%;
+  background: var(--ch-bg-base);
+  border: 1px solid var(--ch-border);
+  border-radius: var(--r-2xl);
+  overflow: hidden;
+}
+
+/* ---------------------------------------------------------------- Sidebar 240 */
+.sidebar{
+  flex: 0 0 var(--sidebar-w);
+  display: flex; flex-direction: column;
+  gap: 6px;
+  padding: var(--sp-lg);
+  background: var(--ch-bg-sidebar);
+}
+
+.logo-row{
+  display: flex; align-items: center; gap: 10px;
+  height: 44px;
+}
+.logo-mark{
+  width: 28px; height: 28px;
+  border-radius: var(--r-lg);
+  background: var(--ch-primary);
+  flex: none;
+}
+.logo-text{
+  font-size: 15px; font-weight: 600; line-height: 1;
+  color: var(--ch-text-primary);
+  letter-spacing: -.01em;
+}
+
+.nav-item{
+  display: flex; align-items: center; gap: 10px;
+  height: var(--nav-h);
+  padding: var(--sp-sm);
+  border: 0; margin: 0;
+  border-radius: var(--r-lg);
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px; font-weight: 400; line-height: 1;
+  color: var(--ch-text-secondary);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color .12s ease, color .12s ease;
+}
+/* 图标配色交给 SVG 自身的 currentColor —— 不用 CSS 通配覆盖，
+   否则会把「素材图库」那种 fill="none" 的描边矩形一起填实 */
+.nav-item .nav-icon{ flex: none; width: 16px; height: 16px; display: block; }
+
+.nav-item:hover{ background: var(--ch-bg-hover); }
+
+/* 选中态：primary 12% 填充 + 主色图标 + 主色文字 */
+.nav-item[aria-current="page"]{
+  background: rgba(59, 130, 246, .12);
+  color: var(--ch-text-primary);
+  font-weight: 500;
+}
+.nav-item[aria-current="page"] .nav-icon{ color: var(--ch-primary); }
+
+/* 系统设置：tertiary 层级（画布中该图标与文字均为 #6B7280） */
+.nav-item.is-tertiary{ color: var(--ch-text-tertiary); }
+
+/* ------------------------------------------------------------------- Main */
+.main{ flex: 1 1 auto; display: flex; flex-direction: column; min-width: 0; }
+
+/* ---------------------------------------------------------------- TopBar 56 */
+.topbar{
+  flex: none;
+  display: flex; align-items: center; justify-content: space-between;
+  height: var(--topbar-h);
+  padding: 0 var(--sp-lg);
+  background: var(--ch-bg-sidebar);
+}
+.breadcrumb{ font-size: 14px; line-height: 1; color: var(--ch-text-secondary); }
+.topbar-right{ display: flex; align-items: center; gap: var(--sp-md); }
+
+.search-box{
+  display: flex; align-items: center;
+  width: 200px; height: 32px;
+  padding: 0 10px;
+  background: var(--ch-bg-input);
+  border: 1px solid var(--ch-border);
+  border-radius: var(--r-md);
+  transition: border-color .12s ease, box-shadow .12s ease;
+}
+.search-box:focus-within{
+  border-color: var(--ch-border-focus);
+  box-shadow: var(--sh-focus);
+}
+.search-box input{
+  width: 100%; border: 0; padding: 0;
+  background: transparent; outline: none;
+  font-family: inherit; font-size: 13px; line-height: 1;
+  color: var(--ch-text-primary);
+}
+.search-box input::placeholder{ color: var(--ch-text-tertiary); }
+
+.avatar{
+  width: 28px; height: 28px; flex: none;
+  border-radius: var(--r-full);
+  /* 画布 F4 Screen/Avatar 实测填充 = #4B5563（值与 border/light 同色） */
+  background: var(--ch-border-light);
+}
+
+/* --------------------------------------------------------------- Content 24 */
+.content{
+  flex: 1 1 auto;
+  display: flex; flex-direction: column;
+  gap: var(--sp-xl);
+  padding: var(--sp-2xl);
+  min-height: 0;
+}
+
+.page-header{
+  display: flex; align-items: center; justify-content: space-between;
+}
+.page-title{
+  margin: 0;
+  font-size: 22px; font-weight: 600; line-height: 1.35;
+  color: var(--ch-text-primary);
+}
+
+/* ------------------------------------------------------------------ Button */
+.btn{
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 36px; padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: var(--r-lg);
+  font-family: inherit; font-size: 14px; font-weight: 500; line-height: 1;
+  cursor: pointer;
+  transition: background-color .12s ease, border-color .12s ease, color .12s ease;
+}
+/* 页面主按钮固定 112px —— 与画布 F4 Page Header / Button Primary 一致 */
+.btn-primary{ background: var(--ch-primary); color: #FFFFFF; min-width: 112px; }
+.btn-primary:hover{ background: var(--ch-primary-active); }
+.btn:focus-visible{
+  outline: none;
+  border-color: var(--ch-border-focus);
+  box-shadow: var(--sh-focus);
+}
+
+/* ------------------------------------------------------------------- Table */
+.table{
+  background: var(--ch-bg-surface);
+  border: 1px solid var(--ch-border);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+}
+
+.row{
+  display: flex; align-items: stretch;
+  border-bottom: 1px solid var(--ch-border);
+}
+.row:last-child{ border-bottom: 0; }
+.row-head{ height: 40px; background: var(--ch-bg-elevated); }
+.row-body{ height: 44px; }
+.row-body.is-interactive{ cursor: pointer; transition: background-color .1s ease; }
+.row-body.is-interactive:hover{ background: rgba(55, 65, 81, .35); }
+
+.cell{ display: flex; align-items: center; padding: 10px; min-width: 0; }
+.cell-title{ flex: 1 1 auto; }
+.cell-status{ flex: 0 0 var(--col-status); gap: 5px; padding: 5px 10px; }
+.cell-platform{ flex: 0 0 var(--col-platform); gap: var(--sp-sm); }
+.cell-updated{ flex: 0 0 var(--col-updated); }
+
+/* 表头：13px / 500 / text.secondary，行高 40 */
+.row-head .cell{ font-size: 13px; font-weight: 500; line-height: 1; color: var(--ch-text-secondary); }
+
+/* 数据行文案层级 */
+.row-body .cell-title{ font-size: 14px; line-height: 1.4; color: var(--ch-text-primary); }
+.row-body .cell-updated{ font-size: 13px; line-height: 1.5; color: var(--ch-text-tertiary); }
+.row-body .cell-platform{ font-size: 13px; line-height: 1.5; color: var(--ch-text-secondary); }
+.row-body .cell-platform.is-empty{ color: var(--ch-text-disabled); }
+
+/* 平台识别圆点 */
+.dot{ width: 8px; height: 8px; flex: none; border-radius: var(--r-full); background: var(--ch-generic); }
+.dot-wechat{ background: var(--ch-wechat); }
+.dot-xhs{ background: var(--ch-xhs); }
+
+/* 状态：完成度指示器（不是状态徽章，用 info 色圆点 + 同色文字） */
+.status-plain{
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; font-weight: 500; line-height: 1.4;   /* Caption 12/1.4 */
+  color: var(--ch-info);
+}
+.status-plain .dot{ background: currentColor; }
+
+/* 状态徽章 StateBadge：18% 同色底 + 圆点 + 12px/500 文字，radius full
+   行高沿用 Caption 的 1.4 —— 实测徽章总高 5+17+5 = 27px，与画布一致 */
+.badge{
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px;
+  border-radius: var(--r-full);
+  font-size: 12px; font-weight: 500; line-height: 1.4;
+}
+.badge .dot{ background: currentColor; }
+.badge-draft{ background: rgba(99, 115, 140, .18); color: var(--ch-text-secondary); }
+.badge-drafted{ background: rgba(59, 130, 246, .18); color: var(--ch-primary); }
+
+/* 未定义页面的诚实占位（不虚构设计） */
+.empty-page{
+  display: flex; align-items: center; justify-content: center;
+  flex: 1 1 auto;
+  border: 1px dashed var(--ch-border-light);
+  border-radius: var(--r-xl);
+  font-size: 13px; line-height: 1.5;
+  color: var(--ch-text-tertiary);
+  text-align: center;
+  padding: var(--sp-2xl);
+}
+
+/* 无障碍：尊重减少动效偏好 */
+@media (prefers-reduced-motion: reduce){
+  *{ transition: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="stage" id="stage">
+  <div class="screen">
+
+    <!-- ============================================================ Sidebar -->
+    <aside class="sidebar" aria-label="主导航">
+      <div class="logo-row">
+        <span class="logo-mark" aria-hidden="true"></span>
+        <span class="logo-text">contentHub</span>
+      </div>
+      <nav id="nav" style="display:flex;flex-direction:column;gap:6px"></nav>
+    </aside>
+
+    <!-- =============================================================== Main -->
+    <div class="main">
+
+      <!-- TopBar 56 -->
+      <header class="topbar">
+        <span class="breadcrumb" id="breadcrumb">主题库  /  全部主题</span>
+        <div class="topbar-right">
+          <div class="search-box">
+            <input type="search" id="search" placeholder="搜索标题或编码" aria-label="搜索标题或编码" />
+          </div>
+          <span class="avatar" role="img" aria-label="用户头像"></span>
+        </div>
+      </header>
+
+      <!-- Content 24 -->
+      <main class="content">
+        <div class="page-header">
+          <h1 class="page-title" id="pageTitle">主题库</h1>
+          <button class="btn btn-primary" id="btnPrimary" type="button">新建主题</button>
+        </div>
+
+        <div id="slot"></div>
+      </main>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ============================================================================
+ * 图标：直接来自画布 export_nodes 导出的真实矢量路径
+ * （仅把 fill/stroke 换成 currentColor，以便继承导航项状态色）
+ * 16x16 viewBox，线宽 1.4
+ * ========================================================================= */
+const ICONS = {
+  home: '<path fill="currentColor" transform="matrix(1 0 0 1 2 2)" fill-rule="evenodd" d="M5.5519 -0.5378Q5.7447 -0.7052 6 -0.7Q6.2553 -0.7052 6.4481 -0.5378L12.4481 4.4622Q12.5685 4.5615 12.6339 4.7031Q12.7008 4.844 12.7 5L12.7 12Q12.7 12.7042 12.2021 13.2021Q11.7042 13.7 11 13.7L1 13.7Q0.2958 13.7 -0.2021 13.2021Q-0.7 12.7042 -0.7 12L-0.7 5Q-0.7008 4.844 -0.6339 4.7031Q-0.5685 4.5615 -0.4481 4.4622L5.5519 -0.5378ZM0.7 5.3279L0.7 12Q0.7 12.1243 0.7879 12.2121Q0.8757 12.3 1 12.3L11 12.3Q11.1243 12.3 11.2121 12.2121Q11.3 12.1243 11.3 12L11.3 5.3279L6 0.9112L0.7 5.3279Z"/>',
+  layers: '<path fill="currentColor" transform="matrix(1 0 0 1 2 2)" fill-rule="evenodd" d="M12.313 2.3739Q12.4148 2.4245 12.495 2.505Q12.5755 2.5852 12.6261 2.687Q12.7649 2.9456 12.6641 3.2214Q12.5793 3.5024 12.313 3.6261L6.313 6.6261Q6.1655 6.701 6 6.7Q5.8345 6.701 5.687 6.6261L-0.313 3.6261Q-0.4148 3.5755 -0.495 3.495Q-0.5755 3.4148 -0.6261 3.313Q-0.7649 3.0544 -0.6641 2.7786Q-0.5793 2.4976 -0.313 2.3739L5.687 -0.6261Q5.8345 -0.701 6 -0.7Q6.1655 -0.701 6.313 -0.6261L12.313 2.3739ZM6 0.7826L1.5652 3L6 5.2174L10.4348 3L6 0.7826Z"/><path fill="currentColor" transform="matrix(1 0 0 1 2 8.5)" fill-rule="evenodd" d="M0.313 -0.6261L6 2.2174L11.687 -0.6261Q11.9456 -0.7649 12.2214 -0.6641Q12.5024 -0.5793 12.6261 -0.313Q12.7649 -0.0544 12.6641 0.2214Q12.5793 0.5024 12.313 0.6261L6.313 3.6261Q6.1655 3.701 6 3.7Q5.8345 3.701 5.687 3.6261L-0.313 0.6261Q-0.5793 0.5024 -0.6641 0.2214Q-0.7649 -0.0544 -0.6261 -0.313Q-0.5024 -0.5793 -0.2214 -0.6641Q0.0544 -0.7649 0.313 -0.6261Z"/>',
+  image: '<rect transform="matrix(1 0 0 1 2 3)" width="12" height="10" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="1.4"/><circle fill="currentColor" transform="matrix(1 0 0 1 4.8 5.3)" cx="1.2" cy="1.2" r="1.2"/><path fill="currentColor" transform="matrix(1 0 0 1 3 8.5)" fill-rule="evenodd" d="M-0.495 3.005L3.005 -0.495Q3.2066 -0.7084 3.5 -0.7Q3.7934 -0.7084 3.995 -0.495L6.0254 1.5354L7.5317 0.1797Q7.7365 -0.0145 8.0184 0.0002Q8.3007 0.0003 8.495 0.205L10.495 2.205Q10.7084 2.4066 10.7 2.7Q10.7084 2.9934 10.495 3.195Q10.2934 3.4084 10 3.4Q9.7066 3.4084 9.505 3.195L7.9746 1.6646L6.4683 3.0203Q6.2635 3.2145 5.9816 3.1998Q5.6993 3.1997 5.505 2.995L3.5 0.9899L0.495 3.995Q0.2934 4.2084 0 4.2Q-0.2934 4.2084 -0.495 3.995Q-0.7084 3.7934 -0.7 3.5Q-0.7084 3.2066 -0.495 3.005Z"/>',
+  render: '<circle transform="matrix(1 0 0 1 5.6 5.6)" cx="2.4" cy="2.4" r="2.4" fill="none" stroke="currentColor" stroke-width="1.4"/><path fill="currentColor" transform="matrix(1 0 0 1 1.6 1.6)" fill-rule="evenodd" d="M7.1 0L7.1 2Q7.1084 2.2934 6.895 2.495Q6.6934 2.7084 6.4 2.7Q6.1066 2.7084 5.905 2.495Q5.6916 2.2934 5.7 2L5.7 0Q5.6916 -0.2934 5.905 -0.495Q6.1066 -0.7084 6.4 -0.7Q6.6934 -0.7084 6.895 -0.495Q7.1084 -0.2934 7.1 0ZM0 5.7L2 5.7Q2.2934 5.6916 2.495 5.905Q2.7084 6.1066 2.7 6.4Q2.7084 6.6934 2.495 6.895Q2.2934 7.1084 2 7.1L0 7.1Q-0.2934 7.1084 -0.495 6.895Q-0.7084 6.6934 -0.7 6.4Q-0.7084 6.1066 -0.495 5.905Q-0.2934 5.6916 0 5.7ZM10.8 5.7L12.8 5.7Q13.0934 5.6916 13.295 5.905Q13.5084 6.1066 13.5 6.4Q13.5084 6.6934 13.295 6.895Q13.0934 7.1084 12.8 7.1L10.8 7.1Q10.5065 7.1084 10.305 6.895Q10.0916 6.6934 10.1 6.4Q10.0916 6.1066 10.305 5.905Q10.5065 5.6916 10.8 5.7ZM7.1 10.8L7.1 12.8Q7.1084 13.0934 6.895 13.295Q6.6934 13.5084 6.4 13.5Q6.1066 13.5084 5.905 13.295Q5.6916 13.0934 5.7 12.8L5.7 10.8Q5.6916 10.5065 5.905 10.305Q6.1066 10.0916 6.4 10.1Q6.6934 10.0916 6.895 10.305Q7.1084 10.5065 7.1 10.8Z"/>',
+  send: '<path fill="currentColor" transform="matrix(1 0 0 1 2 2)" fill-rule="evenodd" d="M8.0202 12.4684Q7.9318 12.5672 7.813 12.6261Q7.5544 12.7649 7.2786 12.6641Q6.9976 12.5793 6.8739 12.313L4.4783 7.5217L-0.313 5.1261Q-0.4318 5.0672 -0.5202 4.9684Q-0.6093 4.8701 -0.6554 4.7458Q-0.7664 4.474 -0.6373 4.2103Q-0.5235 3.9397 -0.2458 3.8446L11.7542 -0.6554Q11.873 -0.7004 12 -0.7Q12.127 -0.7004 12.2458 -0.6554Q12.5235 -0.5603 12.6373 -0.2897Q12.7664 -0.026 12.6554 0.2458L8.1554 12.2458Q8.1093 12.3701 8.0202 12.4684ZM1.7488 4.5918L4.8618 6.1483L9.2199 1.7901L1.7488 4.5918ZM7.4082 10.2512L10.2099 2.7801L5.8517 7.1382L7.4082 10.2512Z"/>',
+  shield: '<path fill="currentColor" transform="matrix(1 0 0 1 2.5 1.5)" fill-rule="evenodd" d="M11.2392 1.3421Q11.4487 1.415 11.5733 1.5984Q11.7031 1.7783 11.7 2L11.7 7Q11.7 9.4596 9.9166 11.3107Q8.285 13.0042 5.6749 13.6778Q5.5889 13.7001 5.5 13.7Q5.4111 13.7001 5.3251 13.6778Q2.715 13.0042 1.0834 11.3107Q-0.7 9.4596 -0.7 7L-0.7 2Q-0.7031 1.7783 -0.5733 1.5984Q-0.4487 1.415 -0.2392 1.3421L5.2608 -0.6579Q5.3766 -0.7003 5.5 -0.7Q5.6234 -0.7003 5.7392 -0.6579L11.2392 1.3421ZM5.5 0.7448L0.7 2.4903L0.7 7Q0.7 8.8949 2.0916 10.3393Q3.3947 11.6919 5.5 12.2754Q7.6053 11.6919 8.9084 10.3393Q10.3 8.8949 10.3 7L10.3 2.4903L5.5 0.7448Z"/><path fill="currentColor" transform="matrix(1 0 0 1 5.8 6.6)" fill-rule="evenodd" d="M0.495 0.905L1.6 2.0101L4.105 -0.495Q4.3066 -0.7084 4.6 -0.7Q4.8934 -0.7084 5.095 -0.495Q5.3084 -0.2934 5.3 0Q5.3084 0.2934 5.095 0.495L2.095 3.495Q1.8934 3.7084 1.6 3.7Q1.3066 3.7084 1.105 3.495L-0.495 1.895Q-0.7084 1.6934 -0.7 1.4Q-0.7084 1.1066 -0.495 0.905Q-0.2934 0.6916 0 0.7Q0.2934 0.6916 0.495 0.905Z"/>',
+  gear: '<circle transform="matrix(1 0 0 1 5.6 5.6)" cx="2.4" cy="2.4" r="2.4" fill="none" stroke="currentColor" stroke-width="1.4"/><path fill="currentColor" transform="matrix(1 0 0 1 1.6 1.6)" fill-rule="evenodd" d="M7.1 0L7.1 2Q7.1084 2.2934 6.895 2.495Q6.6934 2.7084 6.4 2.7Q6.1066 2.7084 5.905 2.495Q5.6916 2.2934 5.7 2L5.7 0Q5.6916 -0.2934 5.905 -0.495Q6.1066 -0.7084 6.4 -0.7Q6.6934 -0.7084 6.895 -0.495Q7.1084 -0.2934 7.1 0ZM0 5.7L2 5.7Q2.2934 5.6916 2.495 5.905Q2.7084 6.1066 2.7 6.4Q2.7084 6.6934 2.495 6.895Q2.2934 7.1084 2 7.1L0 7.1Q-0.2934 7.1084 -0.495 6.895Q-0.7084 6.6934 -0.7 6.4Q-0.7084 6.1066 -0.495 5.905Q-0.2934 5.6916 0 5.7ZM10.8 5.7L12.8 5.7Q13.0934 5.6916 13.295 5.905Q13.5084 6.1066 13.5 6.4Q13.5084 6.6934 13.295 6.895Q13.0934 7.1084 12.8 7.1L10.8 7.1Q10.5065 7.1084 10.305 6.895Q10.0916 6.6934 10.1 6.4Q10.0916 6.1066 10.305 5.905Q10.5065 5.6916 10.8 5.7ZM7.1 10.8L7.1 12.8Q7.1084 13.0934 6.895 13.295Q6.6934 13.5084 6.4 13.5Q6.1066 13.5084 5.905 13.295Q5.6916 13.0934 5.7 12.8L5.7 10.8Q5.6916 10.5065 5.905 10.305Q6.1066 10.0916 6.4 10.1Q6.6934 10.0916 6.895 10.305Q7.1084 10.5065 7.1 10.8Z"/>'
+};
+function icon(name){
+  return '<svg class="nav-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">' + ICONS[name] + '</svg>';
+}
+
+/* ============================================================================
+ * 导航：与画布 Sidebar 完全一致的 7 项与顺序
+ * isTertiary 对应画布中 #6B7280 那一项（系统设置）
+ * ========================================================================= */
+const NAV = [
+  { id: 'workspace', label: '工作台',   icon: 'home'   },
+  { id: 'topics',    label: '主题库',   icon: 'layers' },
+  { id: 'assets',    label: '素材图库', icon: 'image'  },
+  { id: 'render',    label: '渲染任务', icon: 'render' },
+  { id: 'delivery',  label: '投递记录', icon: 'send'   },
+  { id: 'compliance',label: '合规校验', icon: 'shield' },
+  { id: 'settings',  label: '系统设置', icon: 'gear', isTertiary: true }
+];
+
+/* ============================================================================
+ * 主题库表格数据 —— 逐字取自画布 F4 Table / Row 1-3
+ * status 三态刻意各不相同，用来展示三种不同表达：
+ *   plain   完成度指示器（info 色）       —— 「已渲染」
+ *   draft   状态徽章 · 中性              —— 「草稿」
+ *   drafted 状态徽章 · primary           —— 「已推草稿」
+ * ========================================================================= */
+const TOPICS = [
+  {
+    title: '敦煌壁画的色谱研究',
+    status: { kind: 'plain', text: '已渲染' },
+    platforms: ['wechat', 'xhs'],
+    platformText: '微信 · 小红书',
+    updated: '2 小时前'
+  },
+  {
+    title: '宋代点茶考据与器皿形制',
+    status: { kind: 'draft', text: '草稿' },
+    platforms: [],
+    platformText: '未选平台',
+    updated: '1 天前'
+  },
+  {
+    title: '明代家具榫卯结构图解',
+    status: { kind: 'drafted', text: '已推草稿' },
+    platforms: ['wechat'],
+    platformText: '微信公众号',
+    updated: '3 天前'
+  }
+];
+
+const PLATFORM_CLASS = { wechat: 'dot-wechat', xhs: 'dot-xhs', generic: '' };
+
+/* --------------------------------------------------------------- 渲染函数 */
+function renderNav(activeId){
+  document.getElementById('nav').innerHTML = NAV.map(function(item){
+    var current = item.id === activeId ? ' aria-current="page"' : '';
+    var tertiary = item.isTertiary ? ' is-tertiary' : '';
+    return '<button type="button" class="nav-item' + tertiary + '" data-nav="' + item.id + '"' + current + '>'
+         +   icon(item.icon)
+         +   '<span>' + item.label + '</span>'
+         + '</button>';
+  }).join('');
+}
+
+function renderStatus(status){
+  if (status.kind === 'plain'){
+    return '<span class="status-plain"><span class="dot"></span>' + status.text + '</span>';
+  }
+  return '<span class="badge badge-' + status.kind + '"><span class="dot"></span>' + status.text + '</span>';
+}
+
+function renderPlatforms(row){
+  if (!row.platforms.length){
+    return '<div class="cell cell-platform is-empty">' + row.platformText + '</div>';
+  }
+  var dots = row.platforms.map(function(p){
+    return '<span class="dot ' + PLATFORM_CLASS[p] + '"></span>';
+  }).join('');
+  return '<div class="cell cell-platform">' + dots + '<span>' + row.platformText + '</span></div>';
+}
+
+function renderTable(){
+  var head = '<div class="row row-head">'
+    + '<div class="cell cell-title">标题</div>'
+    + '<div class="cell cell-status">状态</div>'
+    + '<div class="cell cell-platform">平台</div>'
+    + '<div class="cell cell-updated">更新时间</div>'
+    + '</div>';
+
+  var body = TOPICS.map(function(row){
+    return '<div class="row row-body is-interactive" tabindex="0">'
+      + '<div class="cell cell-title">' + row.title + '</div>'
+      + '<div class="cell cell-status">' + renderStatus(row.status) + '</div>'
+      + renderPlatforms(row)
+      + '<div class="cell cell-updated">' + row.updated + '</div>'
+      + '</div>';
+  }).join('');
+
+  return '<div class="table" role="table" aria-label="主题列表">' + head + body + '</div>';
+}
+
+/* ----------------------------------------------------- 路由（纯前端壳层） */
+function render(pageId){
+  var item = NAV.filter(function(n){ return n.id === pageId; })[0] || NAV[1];
+  var isTopics = item.id === 'topics';
+
+  renderNav(item.id);
+  document.getElementById('breadcrumb').textContent = isTopics
+    ? '主题库  /  全部主题'
+    : item.label + '  /  全部';
+  document.getElementById('pageTitle').textContent = item.label;
+
+  // 「新建主题」只在主题库页出现（与画布 F4 一致）
+  document.getElementById('btnPrimary').style.display = isTopics ? '' : 'none';
+
+  document.getElementById('slot').innerHTML = isTopics
+    ? renderTable()
+    : '<div class="empty-page">「' + item.label + '」在 v1.1 设计稿中只有导航入口，<br />未提供页面示例（F4 仅定义了主题库 P-02）。</div>';
+}
+
+/* ------------------------------------------------------------------ 事件 */
+document.getElementById('nav').addEventListener('click', function(e){
+  var btn = e.target.closest('[data-nav]');
+  if (btn) render(btn.dataset.nav);
+});
+
+document.getElementById('btnPrimary').addEventListener('click', function(){
+  if (typeof console !== 'undefined') console.log('[contentHub] 新建主题 —— 接入时跳转主题创建流程');
+});
+
+/* ---------------------------------------------------- 等比缩放：锁死像素 */
+var stage = document.getElementById('stage');
+function fit(){
+  var scale = Math.min(
+    window.innerWidth  / 1344,
+    window.innerHeight / 780,
+    1                                   /* 上限 1：不放大小尺寸画布，保持原始像素 */
+  );
+  stage.style.transform = 'translate(-50%, -50%) scale(' + scale + ')';
+}
+window.addEventListener('resize', fit);
+
+fit();
+render('topics');
+</script>
+</body>
+</html>

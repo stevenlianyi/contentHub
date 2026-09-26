@@ -1,0 +1,349 @@
+/* ============================================================================
+ * 内容中枢 · CSS 变量桥接层（计划 §2.3 / Step 1）
+ * ----------------------------------------------------------------------------
+ * 三条落地路径中的第 ② 条：把 `src/js/tokens.js` 输出为 `:root` 的 `--ch-*`，
+ * 再把 Element Plus 的 `--el-*` 全部指向 `--ch-*`，实现「Token 单点注入」。
+ *
+ * 结构：
+ *   ① `:root`            —— Token → `--ch-*`（应用级，暗色）
+ *   ② `:root, html.dark` —— `--el-*` 覆盖
+ *        · 选择器必须包含 `html.dark`：Element Plus 的 `theme-chalk/dark/css-vars.css`
+ *          把变量定义在 `html.dark` 上（0,1,1），仅用 `:root`（0,1,0）会被它反超；
+ *          本文件在 main.js 中于 EP 样式之后引入，同特异性下后者胜出。
+ *        · 覆盖范围严格限于计划 Step 1 第 4 点列举的变量集合。
+ *   ③ `.preview-scope`   —— 预览区强制浅色隔离（唯一浅色区域，不依赖 `html.dark`）
+ *   ④ `.el-table .el-table__cell > .cell` —— EP 结构性对齐：单元格内边距归位（见文末）
+ *
+ * 约束：本文件是 `scripts/lint-hex.mjs` 的白名单文件（负责把色值集中在 Token 层）；
+ *      其余任何文件都不得出现硬编码十六进制色值。
+ * ========================================================================== */
+
+/* ==========================================================================
+ * ① Token → --ch-*（应用级暗色；取值同 src/js/tokens.js）
+ * ======================================================================== */
+:root {
+  /* 背景 */
+  --ch-bg-base: #030712;
+  --ch-bg-sidebar: #111827;
+  --ch-bg-surface: #1F2937;
+  --ch-bg-elevated: #374151;
+  --ch-bg-input: #0B1220;
+  --ch-bg-hover: rgba(31, 41, 55, .30); /* C3 裁定值 */
+
+  /* 文字 */
+  --ch-text-primary: #F3F4F6;
+  --ch-text-secondary: #9CA3AF;
+  --ch-text-tertiary: #6B7280;
+  --ch-text-disabled: #4B5563;
+  --ch-text-inverse: #111827;
+
+  /* 描边与分隔 */
+  --ch-border-default: #374151;
+  --ch-border-light: #4B5563;
+  --ch-border-focus: #3B82F6;
+  --ch-divider: rgba(55, 65, 81, .50);
+
+  /* 主色 */
+  --ch-primary: #3B82F6;
+  --ch-primary-hover: #2563EB;
+  --ch-primary-active: #1D4ED8;
+  --ch-primary-subtle: rgba(59, 130, 246, .12);
+
+  /* 状态色 */
+  --ch-status-success: #10B981;
+  --ch-status-warning: #F59E0B;
+  --ch-status-danger: #EF4444;
+  --ch-status-info: #06B6D4; /* C4 裁定值 */
+
+  /* 平台识别色（仅用于平台身份标识） */
+  --ch-platform-wechat: #07C160;
+  --ch-platform-xiaohongshu: #FF2442;
+  --ch-platform-generic: #6B7280;
+
+  /* 字体族 */
+  --ch-font-cjk: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  --ch-font-latin: Inter, sans-serif;
+  --ch-font-mono: "JetBrains Mono", Consolas, ui-monospace, monospace;
+
+  /* 字号 */
+  --ch-font-size-display: 32px;
+  --ch-font-size-h1: 22px;
+  --ch-font-size-h2: 18px;
+  --ch-font-size-h3: 16px;
+  --ch-font-size-body: 14px;
+  --ch-font-size-body-s: 13px;
+  --ch-font-size-caption: 12px;
+  --ch-font-size-code: 12px;
+
+  /* 间距（4px 基准） */
+  --ch-space-xs: 4px;
+  --ch-space-sm: 8px;
+  --ch-space-md: 12px;
+  --ch-space-lg: 16px;
+  --ch-space-xl: 20px;
+  --ch-space-2xl: 24px;
+  --ch-space-3xl: 32px;
+  --ch-space-4xl: 40px;
+  --ch-space-5xl: 48px;
+
+  /* 圆角 */
+  --ch-radius-sm: 4px;
+  --ch-radius-md: 6px;
+  --ch-radius-lg: 8px;
+  --ch-radius-xl: 12px;
+  --ch-radius-2xl: 16px;
+  --ch-radius-full: 9999px;
+
+  /* 阴影（卡片默认不用阴影，靠 border 分层） */
+  --ch-shadow-raised: 0 4px 16px rgba(0, 0, 0, .40);
+  --ch-shadow-modal: 0 8px 32px rgba(0, 0, 0, .50);
+  --ch-shadow-focus: 0 0 0 3px rgba(59, 130, 246, .25);
+  --ch-shadow-device: 0 0 0 1px #374151, 0 24px 48px rgba(0, 0, 0, .55);
+
+  /* 动效（时长 / 缓动） */
+  --ch-duration-micro: 150ms;
+  --ch-duration-background: 200ms;
+  --ch-duration-modal-enter: 250ms;
+  --ch-duration-modal-leave: 180ms;
+  --ch-duration-drawer: 250ms;
+  --ch-duration-tab-indicator: 250ms;
+  --ch-duration-list-enter: 240ms;
+  --ch-stagger-list-enter: 40ms;
+  --ch-duration-pulse: 2000ms;
+  --ch-duration-shimmer: 1500ms;
+  --ch-ease-out: ease-out;
+  --ch-ease-in: ease-in;
+  --ch-ease-drawer: cubic-bezier(0.4, 0, 0.2, 1);
+  --ch-ease-pulse: ease-in-out;
+
+  /* 布局（设计稿基准 C5：Ardot 1344×780；Web 实现 1440 基准） */
+  --ch-artboard-w: 1344px;
+  --ch-artboard-h: 780px;
+  --ch-web-base-w: 1440px;
+  --ch-sidebar-w: 240px;
+  --ch-sidebar-collapsed-w: 64px;
+  --ch-topbar-h: 56px;
+  --ch-nav-item-h: 36px;
+  --ch-content-max-w: 1440px;
+  --ch-content-padding: 24px;
+  --ch-card-padding: 20px;
+  --ch-table-row-h: 44px;
+  --ch-table-row-compact-h: 36px;
+  --ch-table-head-h: 40px;
+  --ch-cell-pad-x: 16px;
+  --ch-col-status-w: 96px;
+  --ch-col-platform-w: 180px;
+  --ch-col-updated-w: 110px;
+
+  /* 预览区 Token 的应用级镜像：供 Tailwind `bg-ch-preview-bg` 等工具类使用；
+     `.preview-scope` 内不引用本组变量，见文件末尾说明 */
+  --ch-preview-bg: #FFFFFF;
+  --ch-preview-text: #1F2937;
+  --ch-preview-border: #E5E7EB;
+}
+
+/* ==========================================================================
+ * ② Element Plus 变量覆盖（值一律引用 --ch-*）
+ * ======================================================================== */
+:root,
+html.dark {
+  /* 字体与基准 */
+  --el-font-family: var(--ch-font-cjk);
+  --el-font-size-base: var(--ch-font-size-body);
+  --el-border-radius-base: var(--ch-radius-md);
+  --el-border-radius-small: var(--ch-radius-sm);
+  --el-border-radius-round: var(--ch-radius-full);
+  --el-transition-duration: var(--ch-duration-modal-enter);
+  --el-transition-duration-fast: var(--ch-duration-micro);
+
+  /* 主色（light-3/5/7/8/9 = 与黑按 10% 递增混合；dark-2 = 与白 20% 混合） */
+  --el-color-primary: var(--ch-primary);
+  --el-color-primary-light-3: #295BAC;
+  --el-color-primary-light-5: #1E417B;
+  --el-color-primary-light-7: #12274A;
+  --el-color-primary-light-8: #0C1A31;
+  --el-color-primary-light-9: #060D19;
+  --el-color-primary-dark-2: #629BF8;
+
+  /* 成功 */
+  --el-color-success: var(--ch-status-success);
+  --el-color-success-light-3: #0B825A;
+  --el-color-success-light-5: #085D41;
+  --el-color-success-light-7: #053827;
+  --el-color-success-light-8: #03251A;
+  --el-color-success-light-9: #02130D;
+  --el-color-success-dark-2: #40C79A;
+
+  /* 警告 */
+  --el-color-warning: var(--ch-status-warning);
+  --el-color-warning-light-3: #AC6F08;
+  --el-color-warning-light-5: #7B4F06;
+  --el-color-warning-light-7: #4A2F03;
+  --el-color-warning-light-8: #312002;
+  --el-color-warning-light-9: #191001;
+  --el-color-warning-dark-2: #F7B13C;
+
+  /* 危险 / 错误（EP 中 danger 与 error 为两个键，取同一 Token） */
+  --el-color-danger: var(--ch-status-danger);
+  --el-color-danger-light-3: #A73030;
+  --el-color-danger-light-5: #782222;
+  --el-color-danger-light-7: #481414;
+  --el-color-danger-light-8: #300E0E;
+  --el-color-danger-light-9: #180707;
+  --el-color-danger-dark-2: #F26969;
+  --el-color-error: var(--ch-status-danger);
+  --el-color-error-light-3: #A73030;
+  --el-color-error-light-5: #782222;
+  --el-color-error-light-7: #481414;
+  --el-color-error-light-8: #300E0E;
+  --el-color-error-light-9: #180707;
+  --el-color-error-dark-2: #F26969;
+
+  /* 信息（C4 裁定值 #06B6D4） */
+  --el-color-info: var(--ch-status-info);
+  --el-color-info-light-3: #047F94;
+  --el-color-info-light-5: #035B6A;
+  --el-color-info-light-7: #023740;
+  --el-color-info-light-8: #01242A;
+  --el-color-info-light-9: #011215;
+  --el-color-info-dark-2: #38C5DD;
+
+  /* 主色/状态色的 rgb 分量孪生变量：EP 内部以 rgba(var(--el-color-*-rgb), x) 组合半透明色，
+     不覆盖会残留 EP 默认色偏（#409eff / #67c23a / #e6a23c / #f56c6c / #909399） */
+  --el-color-primary-rgb: 59, 130, 246;
+  --el-color-success-rgb: 16, 185, 129;
+  --el-color-warning-rgb: 245, 158, 11;
+  --el-color-danger-rgb: 239, 68, 68;
+  --el-color-error-rgb: 239, 68, 68;
+  --el-color-info-rgb: 6, 182, 212;
+
+  /* 背景 */
+  --el-bg-color: var(--ch-bg-surface);
+  --el-bg-color-page: var(--ch-bg-base);
+  --el-bg-color-overlay: var(--ch-bg-elevated);
+
+  /* 文字 */
+  --el-text-color-primary: var(--ch-text-primary);
+  --el-text-color-regular: var(--ch-text-primary);
+  --el-text-color-secondary: var(--ch-text-secondary);
+  --el-text-color-placeholder: var(--ch-text-tertiary);
+  --el-text-color-disabled: var(--ch-text-disabled);
+
+  /* 描边 */
+  --el-border-color: var(--ch-border-default);
+  --el-border-color-light: var(--ch-border-light);
+  --el-border-color-lighter: var(--ch-border-light);
+  --el-border-color-extra-light: var(--ch-border-default);
+  --el-border-color-dark: var(--ch-border-default);
+  --el-border-color-darker: var(--ch-border-default);
+
+  /* 填充 */
+  --el-fill-color: var(--ch-bg-elevated);
+  --el-fill-color-light: var(--ch-bg-hover);
+  --el-fill-color-lighter: var(--ch-bg-hover);
+  --el-fill-color-extra-light: var(--ch-bg-hover);
+  --el-fill-color-dark: var(--ch-bg-input);
+  --el-fill-color-darker: var(--ch-bg-input);
+  --el-fill-color-blank: var(--ch-bg-input);
+
+  /* 禁用态 */
+  --el-disabled-bg-color: var(--ch-bg-input);
+  --el-disabled-text-color: var(--ch-text-disabled);
+  --el-disabled-border-color: var(--ch-border-default);
+
+  /* 浮层阴影与遮罩 */
+  --el-box-shadow: var(--ch-shadow-modal);
+  --el-box-shadow-light: var(--ch-shadow-raised);
+  --el-box-shadow-lighter: var(--ch-shadow-raised);
+  --el-box-shadow-dark: var(--ch-shadow-modal);
+  --el-mask-color: rgba(3, 7, 18, .80);
+  --el-mask-color-extra-light: rgba(3, 7, 18, .40);
+
+  /* 表格（§1.4：表头 bg/elevated + 行高 40；数据行 44；行分隔 1px border/default） */
+  --el-table-bg-color: var(--ch-bg-surface);
+  --el-table-tr-bg-color: var(--ch-bg-surface);
+  --el-table-header-bg-color: var(--ch-bg-elevated);
+  --el-table-header-text-color: var(--ch-text-secondary);
+  --el-table-text-color: var(--ch-text-primary);
+  --el-table-border-color: var(--ch-border-default);
+  --el-table-border: 1px solid var(--ch-border-default);
+  --el-table-row-hover-bg-color: var(--ch-bg-hover);
+  --el-table-current-row-bg-color: var(--ch-primary-subtle);
+
+  /* 弹层圆角 */
+  --el-dialog-border-radius: var(--ch-radius-2xl);
+  --el-popover-border-radius: var(--ch-radius-xl);
+}
+
+/* ==========================================================================
+ * ③ 预览隔离作用域（P0-3「预览保真」；唯一浅色区域）
+ * --------------------------------------------------------------------------
+ * 硬约束：本作用域内**不得出现** `bg-ch-surface` / `text-ch-text-primary` 等
+ *        应用级暗色 Token（含 Tailwind 类与 `--ch-*` 变量引用）。
+ * 本块内三个浅色字面量等于 `src/js/tokens.js` 的 `preview.*`（本文件在
+ * `scripts/lint-hex.mjs` 白名单内）；此处有意不复用 `--ch-preview-*`，
+ * 以保证隔离作用域自洽、且不依赖 `html.dark` 是否存在。
+ * ======================================================================== */
+.preview-scope {
+  --preview-bg: #FFFFFF;
+  --preview-text: #1F2937;
+  --preview-border: #E5E7EB;
+
+  /* 在预览作用域内重置 Element Plus 为浅色，不依赖 html.dark */
+  --el-bg-color: var(--preview-bg);
+  --el-bg-color-page: var(--preview-bg);
+  --el-bg-color-overlay: var(--preview-bg);
+  --el-fill-color: var(--preview-border);
+  --el-fill-color-light: var(--preview-border);
+  --el-fill-color-lighter: var(--preview-border);
+  --el-fill-color-extra-light: var(--preview-border);
+  --el-fill-color-blank: var(--preview-bg);
+  --el-text-color-primary: var(--preview-text);
+  --el-text-color-regular: var(--preview-text);
+  --el-text-color-secondary: var(--preview-text);
+  --el-text-color-placeholder: var(--preview-text);
+  --el-text-color-disabled: var(--preview-border);
+  --el-border-color: var(--preview-border);
+  --el-border-color-light: var(--preview-border);
+  --el-border-color-lighter: var(--preview-border);
+  --el-border-color-extra-light: var(--preview-border);
+  --el-border-color-dark: var(--preview-border);
+  --el-border-color-darker: var(--preview-border);
+  --el-color-white: var(--preview-bg);
+  --el-color-black: var(--preview-text);
+  --el-mask-color: rgba(31, 41, 55, .30);
+  --el-color-primary: #2563EB;
+
+  color-scheme: light;
+  background: var(--preview-bg);
+  color: var(--preview-text);
+}
+
+/* ==========================================================================
+ * ④ Element Plus 结构性对齐：表格单元格内边距
+ * --------------------------------------------------------------------------
+ * 口径来源（规格侧，未改动）：单元格横向内边距 = **16**，即
+ * `tokens.layout.cellPadX`，由各表的 `cell-style` / `header-cell-style`
+ * 施加在 `td` / `th` 上（`components/base/AppTable.vue` 与 `views/RenderJobs.vue`
+ * 全部直用 `el-table` 的两处都走这套）。
+ *
+ * 问题：EP 还给每格的**内层** `.cell` 默认再叠一层内边距 ——
+ *   default 尺寸 `padding: 0 12px`（另有 `.el-table--large` 16px / `--small` 8px 两套
+ *   尺寸变体）→ 实际每侧 = 16 + 12 = 28，比规格多 12。
+ *   平台列因此容不下平台胶囊：`/my-accounts`、`/accounts`、`CredentialCheckPanel`
+ *   的平台列均为 132，可用宽度 = 132 − 16×2 − 12×2 = **76**，而 `PlatformChip`
+ *   实测 **94**（微信公众号）/ **95**（通用HTML）→ 胶囊右侧越过 `.cell` 的 border-box，
+ *   被其 `overflow:hidden` 切掉 **6~7px**（左圆角在、右圆角与右边框被切平）。
+ *   即：`PlatformChip` 的「不换行」修复把**纵向折行溢出**换成了**横向裁切**，
+ *   根因就在这层多余内边距，而非列宽不够。
+ *
+ * 处置：把 EP 那层归零，使实际每侧回到规格的 16。修复后 132 列可用宽度回到
+ * 132 − 32 = **100 ≥ 95**，无需改动任何列宽，也与 09-24「收紧列宽」方向一致。
+ *
+ * 选择器说明：比 EP 的尺寸变体（`.el-table--default .cell` 等，0,2,0）多一层
+ * `.el-table__cell >`（0,3,0），故不受样式加载顺序与尺寸类影响；
+ * 仅覆写 `padding`，EP 在该规则里的 `text-overflow/overflow/line-height` 等一并保留。
+ * ======================================================================== */
+.el-table .el-table__cell > .cell {
+  padding: 0;
+}

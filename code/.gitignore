@@ -1,0 +1,33 @@
+# ===== Python =====
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# ===== Logs =====
+*.log
+logs/
+log/
+
+# ===== Node / frontend (webserver) =====
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# ===== Playwright 录制（测试生成物） =====
+.playwright-cli/
+
+# ===== 运行时数据（程序生成，非源码） =====
+data/filestorage/
+data/webserver/temp/
+data/preview/
+data/monitor/
+data/assetpack/
+
+# ===== OS / 编辑器 =====
+.DS_Store
+Thumbs.db

@@ -1,0 +1,31 @@
+{#
+  swipe_v1 · 左右滑动多图集(仅小红书; 平台原生交互)。
+  specJson 键(见 tools/initSeed.py): size / ratio / maxCount / minCount / uniformRatio /
+    maxSizePerImageMB / format / sortable / coverFlag。
+  ★ 本项目只做「切分 + 排序 + 统一比例」: 输出 N 张等比例卡片(data-card-seqno 递增, 第 1 张为封面标记),
+    **不自实现滑动交互**(滑动由小红书 App 原生提供) —— 因此本模板不得出现 script / onclick / 手势逻辑。
+#}
+{% extends "partials/base.html" %}
+{% block style %}
+[data-layout="swipe_v1"] img{max-width:100%;}
+{% endblock %}
+{% block content %}
+<section data-layout="swipe_v1" data-mechanism="platform_native" data-card-count="{{ meta.cardCount }}"
+         data-ratio="{{ meta.ratio }}" data-size="{{ meta.size }}" data-uniform-ratio="{{ '1' if meta.uniformRatio else '0' }}"
+         style="width:{{ cardWidth }}px;margin:0 auto;background:#fff;">
+  {% for card in cards %}
+  <figure data-swipe-card="1" data-seqno="{{ card.seqNo }}" data-is-cover="{{ card.isCover }}"
+          data-usage="{{ card.usageType }}" data-sort-order="{{ card.sortOrder }}"
+          data-width="{{ card.width }}" data-height="{{ card.height }}" data-ratio="{{ card.ratio }}" data-ratio-ok="{{ card.ratioOk }}"
+          style="margin:0 0 8px 0;width:{{ cardWidth }}px;height:{{ cardHeight }}px;overflow:hidden;position:relative;">
+    <img src="{{ card.fileUrl }}" alt="{{ card.caption }}" style="width:100%;height:100%;object-fit:cover;display:block;"/>
+    {% if card.isCover == '1' %}
+    <span data-cover-badge="1" style="position:absolute;top:10px;left:10px;background:rgba(0,0,0,0.55);color:#fff;font-size:12px;padding:2px 8px;border-radius:10px;">封面</span>
+    {% endif %}
+    {% if card.caption %}
+    <figcaption data-swipe-caption="1" style="position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,0.45);color:#fff;font-size:13px;padding:6px 10px;">{{ card.caption }}</figcaption>
+    {% endif %}
+  </figure>
+  {% endfor %}
+</section>
+{% endblock %}
